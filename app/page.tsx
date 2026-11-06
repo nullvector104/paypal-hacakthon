@@ -48,6 +48,10 @@ interface Club {
   description: string | null;
   balance: number;
   members: ClubMember[];
+  collected?: number;
+  paidOut?: number;
+  tags?: { id: string; name: string; monthlyLimit: number }[];
+  createdAt?: string;
 }
 
 interface MovementItemDetail {
@@ -533,6 +537,17 @@ export default function OrbitApp() {
   const [clubs, setClubs] = useState<Club[]>([]);
   const [activeClub, setActiveClub] = useState<Club | null>(null);
 
+  // Add Club Modal State & Inputs
+  const [showAddClubModal, setShowAddClubModal] = useState<boolean>(false);
+  const [newClubName, setNewClubName] = useState<string>("");
+  const [newClubDescription, setNewClubDescription] = useState<string>("");
+  const [newClubTreasurerName, setNewClubTreasurerName] = useState<string>("Alex Morgan");
+  const [newClubTreasurerEmail, setNewClubTreasurerEmail] = useState<string>("treasurer@club.org");
+  const [newClubTagName, setNewClubTagName] = useState<string>("Club Operations");
+  const [newClubTagLimit, setNewClubTagLimit] = useState<string>("500.00");
+  const [newClubStartingBalance, setNewClubStartingBalance] = useState<string>("0.00");
+  const [creatingClub, setCreatingClub] = useState<boolean>(false);
+
   // Modals State
   const [showSendModal, setShowSendModal] = useState<boolean>(false);
   const [showRequestModal, setShowRequestModal] = useState<boolean>(false);
@@ -645,7 +660,11 @@ export default function OrbitApp() {
       const data = await res.json();
       if (data.clubs && data.clubs.length > 0) {
         setClubs(data.clubs);
-        setActiveClub(data.clubs[0]);
+        setActiveClub((prev) => {
+          if (!prev) return data.clubs[0];
+          const found = data.clubs.find((c: Club) => c.id === prev.id);
+          return found || data.clubs[0];
+        });
       }
     } catch (err) {
       console.error("Failed to load clubs:", err);
@@ -1294,6 +1313,90 @@ export default function OrbitApp() {
       }
     } catch (err) {
       console.error("Dev checkout failed:", err);
+    }
+  };
+
+  // Handle Club selection from scroll-down dropdown menu
+  const handleSelectClub = (clubId: string) => {
+    if (clubId === "__ADD_NEW__") {
+      setShowAddClubModal(true);
+      return;
+    }
+    const selected = clubs.find((c) => c.id === clubId);
+    if (selected) {
+      setActiveClub(selected);
+      fetchClubDues(selected.id);
+      fetchClubClaims(selected.id);
+      fetchClubLedger(selected.id);
+    }
+  };
+
+  // Create New Club with required/obvious details
+  const handleCreateClub = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newClubName.trim()) {
+      setActionNotice({ text: "Please provide a club name.", type: "error" });
+      return;
+    }
+    setCreatingClub(true);
+    try {
+      const res = await fetch("/api/clubs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: newClubName.trim(),
+          description: newClubDescription.trim() || undefined,
+          treasurerName: newClubTreasurerName.trim() || undefined,
+          treasurerEmail: newClubTreasurerEmail.trim() || undefined,
+          tagName: newClubTagName.trim() || undefined,
+          monthlyLimit: parseFloat(newClubTagLimit) || 500,
+          startingBalance: parseFloat(newClubStartingBalance) || 0,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create club");
+      }
+
+      if (data.club) {
+        setClubs((prev) => [...prev, data.club]);
+        setActiveClub(data.club);
+        fetchClubDues(data.club.id);
+        fetchClubClaims(data.club.id);
+        fetchClubLedger(data.club.id);
+        fetchTags();
+        fetchMovements();
+      } else {
+        await fetchClubs();
+      }
+
+      setShowAddClubModal(false);
+      const createdName = newClubName.trim();
+      const depositVal = parseFloat(newClubStartingBalance);
+
+      // Reset input form
+      setNewClubName("");
+      setNewClubDescription("");
+      setNewClubTagName("Club Operations");
+      setNewClubTagLimit("500.00");
+      setNewClubStartingBalance("0.00");
+
+      triggerPaymentSuccess({
+        title: `Club "${createdName}" Created!`,
+        amount: depositVal > 0 ? depositVal : undefined,
+        recipient: newClubTreasurerEmail,
+        note: `Treasury vault initialized for ${createdName}`,
+      });
+
+      setActionNotice({
+        text: `🏛️ Club "${createdName}" created and activated!`,
+        type: "success",
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to create club";
+      setActionNotice({ text: msg, type: "error" });
+    } finally {
+      setCreatingClub(false);
     }
   };
 
@@ -2116,13 +2219,62 @@ export default function OrbitApp() {
 
                 {/* Clubs & Treasury Section */}
                 <div className="section-card">
-                  <div className="section-card-header">
+                  <div className="section-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "0.75rem" }}>
                     <div>
-                      <h3 className="section-card-title">
-                        {activeClub ? activeClub.name : "Robotics Club"} Treasury
-                      </h3>
-                      <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-                        Campus autonomous robotics team treasury & reimbursements
+                      <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
+                        <h3 className="section-card-title" style={{ margin: 0 }}>
+                          {activeClub ? activeClub.name : "Campus Club"} Treasury
+                        </h3>
+                        {/* Club Dropdown Selector & Add Button */}
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                          <select
+                            className="club-scroll-select"
+                            value={activeClub?.id || ""}
+                            onChange={(e) => handleSelectClub(e.target.value)}
+                            style={{
+                              background: "#f1f5f9",
+                              border: "1.5px solid #cbd5e1",
+                              color: "#0f172a",
+                              padding: "0.3rem 0.75rem",
+                              fontSize: "0.82rem",
+                              fontWeight: 700,
+                            }}
+                            title="Switch active club"
+                          >
+                            {clubs.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                🏛️ {c.name} (${c.balance.toFixed(2)})
+                              </option>
+                            ))}
+                            <option value="__ADD_NEW__" style={{ color: "#4f46e5", fontWeight: "bold" }}>
+                              ➕ + Add New Club...
+                            </option>
+                          </select>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddClubModal(true)}
+                            title="Create a new campus club"
+                            style={{
+                              background: "#f0fdf4",
+                              border: "1.5px solid #86efac",
+                              color: "#166534",
+                              borderRadius: "9999px",
+                              padding: "0.28rem 0.65rem",
+                              fontSize: "0.78rem",
+                              fontWeight: 800,
+                              cursor: "pointer",
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "0.2rem",
+                              transition: "all 0.15s ease",
+                            }}
+                          >
+                            <span>+</span> New
+                          </button>
+                        </div>
+                      </div>
+                      <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
+                        {activeClub?.description || "Campus organization treasury, dues collection & expense reimbursements"}
                       </p>
                     </div>
                     <span
@@ -2133,6 +2285,7 @@ export default function OrbitApp() {
                         fontWeight: 700,
                         padding: "0.3rem 0.75rem",
                         borderRadius: "9999px",
+                        whiteSpace: "nowrap",
                       }}
                     >
                       {role === "TREASURER" ? "Treasurer Authorized" : "Member View"}
@@ -4431,7 +4584,7 @@ export default function OrbitApp() {
               }}
             >
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
                   <span
                     style={{
                       background: "rgba(255, 255, 255, 0.2)",
@@ -4457,12 +4610,66 @@ export default function OrbitApp() {
                     {role === "TREASURER" ? "Treasurer Session" : "Member Session"}
                   </span>
                 </div>
+
                 <h2 style={{ fontSize: "1.85rem", fontWeight: 900, marginTop: "0.4rem" }}>
                   {activeClub.name} Treasury
                 </h2>
-                <p style={{ opacity: 0.9, fontSize: "0.88rem", marginTop: "0.2rem" }}>
-                  {activeClub.description || "Autonomous campus robotics team treasury & reimbursements"}
+                <p style={{ opacity: 0.9, fontSize: "0.88rem", marginTop: "0.2rem", maxWidth: "600px" }}>
+                  {activeClub.description || "Autonomous campus organization treasury, dues & reimbursements"}
                 </p>
+
+                {/* Club Dropdown Selector & Add New Club Button */}
+                <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginTop: "0.85rem", flexWrap: "wrap" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
+                    <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "rgba(255,255,255,0.75)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Switch Club:
+                    </span>
+                    <select
+                      className="club-scroll-select-dark"
+                      value={activeClub?.id || ""}
+                      onChange={(e) => handleSelectClub(e.target.value)}
+                      style={{
+                        background: "rgba(255, 255, 255, 0.18)",
+                        border: "1px solid rgba(255, 255, 255, 0.35)",
+                        color: "#ffffff",
+                        padding: "0.35rem 0.9rem",
+                        fontSize: "0.88rem",
+                        fontWeight: 700,
+                        backdropFilter: "blur(6px)",
+                      }}
+                      title="Select or switch club"
+                    >
+                      {clubs.map((c) => (
+                        <option key={c.id} value={c.id} style={{ color: "#0f172a", background: "#ffffff" }}>
+                          🏛️ {c.name} — ${c.balance.toFixed(2)} ({c.members?.length || 0} members)
+                        </option>
+                      ))}
+                      <option value="__ADD_NEW__" style={{ color: "#4f46e5", fontWeight: "bold", background: "#f5f3ff" }}>
+                        ➕ + Add New Club...
+                      </option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAddClubModal(true)}
+                    style={{
+                      background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "9999px",
+                      padding: "0.35rem 0.9rem",
+                      fontSize: "0.82rem",
+                      fontWeight: 800,
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "0.3rem",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                    }}
+                  >
+                    <span>+</span> Add New Club
+                  </button>
+                </div>
               </div>
 
               <div
@@ -6363,6 +6570,173 @@ export default function OrbitApp() {
               >
                 Send Invoice via Invoicing v2
               </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: ADD NEW CLUB & INITIALIZE TREASURY VAULT      */}
+      {/* ==================================================== */}
+      {showAddClubModal && (
+        <div className="modal-overlay" onClick={() => setShowAddClubModal(false)}>
+          <div
+            className="modal-sheet"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "560px", width: "95%" }}
+          >
+            <div className="modal-header-row">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
+                <span style={{ fontSize: "1.5rem" }}>🏛️</span>
+                <div>
+                  <h3 className="modal-sheet-title" style={{ margin: 0 }}>Create New Campus Club</h3>
+                  <p style={{ fontSize: "0.82rem", color: "#64748b", margin: 0 }}>
+                    Configure club vault, treasurer access, and monthly category budget
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-close-modal"
+                onClick={() => setShowAddClubModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateClub} className="modal-form-stack" style={{ marginTop: "1rem" }}>
+              <div className="form-group-field">
+                <label className="form-field-label">
+                  Club Name <span style={{ color: "#ef4444" }}>*</span>
+                </label>
+                <input
+                  type="text"
+                  className="form-input-text"
+                  value={newClubName}
+                  onChange={(e) => setNewClubName(e.target.value)}
+                  placeholder="e.g. Photography Society, AI & Robotics Club, Chess Union"
+                  required
+                />
+              </div>
+
+              <div className="form-group-field">
+                <label className="form-field-label">Club Description / Mission</label>
+                <textarea
+                  className="form-input-text"
+                  rows={2}
+                  value={newClubDescription}
+                  onChange={(e) => setNewClubDescription(e.target.value)}
+                  placeholder="e.g. Official campus organization for workshops, equipment sharing & exhibitions."
+                  style={{ resize: "vertical" }}
+                />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                <div className="form-group-field">
+                  <label className="form-field-label">
+                    Treasurer Name <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input-text"
+                    value={newClubTreasurerName}
+                    onChange={(e) => setNewClubTreasurerName(e.target.value)}
+                    placeholder="e.g. Alex Morgan"
+                    required
+                  />
+                </div>
+
+                <div className="form-group-field">
+                  <label className="form-field-label">
+                    Treasurer Email <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+                  <input
+                    type="email"
+                    className="form-input-text"
+                    value={newClubTreasurerEmail}
+                    onChange={(e) => setNewClubTreasurerEmail(e.target.value)}
+                    placeholder="treasurer@club.org"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                <div className="form-group-field">
+                  <label className="form-field-label">
+                    Initial Expense Category / Tag <span style={{ color: "#ef4444" }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input-text"
+                    value={newClubTagName}
+                    onChange={(e) => setNewClubTagName(e.target.value)}
+                    placeholder="e.g. Club Operations"
+                    required
+                  />
+                </div>
+
+                <div className="form-group-field">
+                  <label className="form-field-label">
+                    Monthly Budget Limit ($)
+                  </label>
+                  <input
+                    type="number"
+                    step="1"
+                    min="1"
+                    className="form-input-text"
+                    value={newClubTagLimit}
+                    onChange={(e) => setNewClubTagLimit(e.target.value)}
+                    placeholder="500.00"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="form-group-field">
+                <label className="form-field-label">
+                  Initial Treasury Vault Seed Deposit ($)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  className="form-input-text"
+                  value={newClubStartingBalance}
+                  onChange={(e) => setNewClubStartingBalance(e.target.value)}
+                  placeholder="0.00"
+                />
+                <span style={{ fontSize: "0.76rem", color: "#64748b", marginTop: "0.25rem", display: "block" }}>
+                  💡 Optional initial funds deposited into the ledger so the club can approve claims right away.
+                </span>
+              </div>
+
+              <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+                <button
+                  type="button"
+                  className="btn-cancel-action"
+                  onClick={() => setShowAddClubModal(false)}
+                  style={{ flex: 1, padding: "0.7rem", borderRadius: "8px", border: "1px solid #cbd5e1", background: "#f8fafc", cursor: "pointer", fontWeight: 600 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn-navy-pill"
+                  disabled={creatingClub}
+                  style={{
+                    flex: 2,
+                    justifyContent: "center",
+                    background: "linear-gradient(135deg, #4f46e5 0%, #003087 100%)",
+                    color: "#ffffff",
+                    fontWeight: 700,
+                    padding: "0.7rem",
+                    borderRadius: "8px",
+                  }}
+                >
+                  {creatingClub ? "Creating Club..." : "✨ Create Club & Vault"}
+                </button>
+              </div>
             </form>
           </div>
         </div>

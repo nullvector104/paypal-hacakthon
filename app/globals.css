@@ -1940,5 +1940,52 @@ body {
   transform: translateY(1px);
 }
 
+/* ==================================================== */
+/* CLUB SELECTOR SCROLL MENU & CONTROLS                */
+/* ==================================================== */
+.club-scroll-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1em;
+  padding-right: 2.25rem !important;
+  cursor: pointer;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  outline: none;
+  max-width: 320px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.club-scroll-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);
+}
+
+.club-scroll-select-dark {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1.1em;
+  padding-right: 2.25rem !important;
+  cursor: pointer;
+  border-radius: 9999px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.club-scroll-select-dark:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+}
+
+
 
 
