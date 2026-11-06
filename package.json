@@ -1,0 +1,34 @@
+{
+  "name": "paypal-ai-shopper",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "db:push": "dotenv -e .env.local -- prisma db push",
+    "db:seed": "dotenv -e .env.local -- tsx prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@paypal/react-paypal-js": "^10.6.1",
+    "@prisma/client": "^6.4.0",
+    "next": "16.4.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv-cli": "^11.1.0",
+    "eslint": "^9",
+    "eslint-config-next": "16.4.3",
+    "prisma": "^6.4.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5"
+  }
+}

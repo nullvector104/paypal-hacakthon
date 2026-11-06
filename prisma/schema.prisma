@@ -1,0 +1,234 @@
+// Prisma schema for Orbit - Treasury, Payments & Smart Budgeting Prototype
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MovementType {
+  CART_PAYMENT
+  SEND
+  REQUEST
+  CLUB_DUES
+  CLUB_PAYOUT
+}
+
+enum MovementDirection {
+  OUTGOING
+  INCOMING
+}
+
+enum MovementStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+  EXPIRED
+  UNCLAIMED
+}
+
+enum MemberRole {
+  TREASURER
+  MEMBER
+}
+
+enum ClaimStatus {
+  SUBMITTED
+  APPROVED
+  REJECTED
+  PAID
+}
+
+model Tag {
+  id           String               @id @default(cuid())
+  name         String               @unique
+  monthlyLimit Float
+  clubId       String?
+  club         Club?                @relation(fields: [clubId], references: [id])
+  movements    Movement[]
+  claims       ReimbursementClaim[]
+  events       EventFundraiser[]
+  billSplits   BillSplit[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+}
+
+model Movement {
+  id            String              @id @default(cuid())
+  type          MovementType
+  direction     MovementDirection
+  counterparty  String              // Recipient email (SEND), Payer email (REQUEST), or Merchant (CART_PAYMENT)
+  amount        Float
+  currency      String              @default("USD")
+  tagId         String
+  tag           Tag                 @relation(fields: [tagId], references: [id])
+  status        MovementStatus      @default(PENDING)
+  paypalRefId   String              @unique // Order ID, Payout Item ID, or Invoice ID
+  paypalBatchId String?             // Batch ID for payouts
+  invoiceUrl    String?             // 'payer-view' link for invoice requests
+  note          String?             // Reason / memo (e.g. "Club October dues", "Snack reimbursement")
+  clubId        String?
+  club          Club?               @relation(fields: [clubId], references: [id])
+  eventId       String?
+  event         EventFundraiser?    @relation(fields: [eventId], references: [id])
+  splitId       String?
+  split         BillSplit?          @relation(fields: [splitId], references: [id])
+  items         MovementItem[]      // Line item details (for cart payments)
+  claim         ReimbursementClaim? // Optional 1-to-1 link if this movement paid a claim
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+
+  @@index([tagId, status, createdAt])
+  @@index([clubId])
+  @@index([eventId])
+  @@index([splitId])
+}
+
+model MovementItem {
+  id         String   @id @default(cuid())
+  movementId String
+  movement   Movement @relation(fields: [movementId], references: [id], onDelete: Cascade)
+  productId  String?
+  title      String
+  imageUrl   String?
+  unitPrice  Float
+  quantity   Int      @default(1)
+  offerUrl   String?
+  createdAt  DateTime @default(now())
+
+  @@index([movementId])
+}
+
+model Club {
+  id          String               @id @default(cuid())
+  name        String
+  description String?
+  balance     Float                @default(0.0)
+  tags        Tag[]
+  members     ClubMember[]
+  movements   Movement[]
+  duesCycles  DuesCycle[]
+  claims      ReimbursementClaim[]
+  auditLogs   AuditLog[]
+  events      EventFundraiser[]
+  billSplits  BillSplit[]
+  createdAt   DateTime             @default(now())
+  updatedAt   DateTime             @updatedAt
+}
+
+model ClubMember {
+  id        String     @id @default(cuid())
+  clubId    String
+  club      Club       @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  name      String
+  email     String
+  role      MemberRole @default(MEMBER)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@unique([clubId, email])
+}
+
+model DuesCycle {
+  id        String   @id @default(cuid())
+  clubId    String
+  club      Club     @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  title     String   // e.g. "Fall 2026 Season Dues"
+  amount    Float    // e.g. 35.00
+  dueDate   DateTime // UTC timestamp
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clubId])
+}
+
+model ReimbursementClaim {
+  id                  String      @id @default(cuid())
+  clubId              String
+  club                Club        @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  requesterEmail      String
+  requesterName       String
+  amount              Float
+  note                String
+  tagId               String
+  tag                 Tag         @relation(fields: [tagId], references: [id])
+  status              ClaimStatus @default(SUBMITTED)
+  reviewedBy          String?     // Approver email
+  reviewedAt          DateTime?
+  rejectionReason     String?
+  flaggedSelfApproved Boolean     @default(false) // True if Treasurer self-reimbursed with certification
+  movementId          String?     @unique // 1-to-1 link to payout movement once paid
+  movement            Movement?   @relation(fields: [movementId], references: [id])
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+
+  @@index([clubId, status])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  clubId    String?
+  club      Club?    @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  who       String   // e.g. "treasurer@roboticsclub.org"
+  role      String   // "TREASURER" | "MEMBER" | "SYSTEM"
+  action    String   // "DUES_CREATED", "CLAIM_SUBMITTED", "CLAIM_APPROVED", "PAYOUT_EXECUTED"
+  target    String   // e.g. "claim:cmvz...", "dues:cmvz..."
+  details   String?  // JSON metadata
+  createdAt DateTime @default(now()) // Strictly append-only (No update or delete code paths)
+
+  @@index([clubId, createdAt])
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  productId String
+  title     String
+  imageUrl  String?
+  unitPrice Float
+  quantity  Int      @default(1)
+  offerUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model EventFundraiser {
+  id          String     @id @default(cuid())
+  clubId      String?
+  club        Club?      @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  goalAmount  Float
+  tagId       String
+  tag         Tag        @relation(fields: [tagId], references: [id])
+  status      String     @default("ACTIVE") // ACTIVE | COMPLETED | CLOSED
+  movements   Movement[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([clubId])
+  @@index([tagId])
+}
+
+model BillSplit {
+  id             String         @id @default(cuid())
+  clubId         String?
+  club           Club?          @relation(fields: [clubId], references: [id], onDelete: Cascade)
+  creatorEmail   String
+  title          String
+  totalAmount    Float
+  includeCreator Boolean        @default(true)
+  tagId          String
+  tag            Tag            @relation(fields: [tagId], references: [id])
+  movements      Movement[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([clubId])
+  @@index([tagId])
+}
+
+
