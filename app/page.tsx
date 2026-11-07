@@ -3254,7 +3254,7 @@ export default function OrbitApp() {
                         </div>
 
                         <div style={{ marginTop: "0.75rem" }}>
-                          <p className="product-card-price">${p.cheapestPrice.toFixed(2)}</p>
+                          <p className="product-card-price">{formatCurrency(p.cheapestPrice)}</p>
                           <button
                             type="button"
                             className="btn-add-instamart"
@@ -3303,7 +3303,7 @@ export default function OrbitApp() {
                               {item.title}
                             </p>
                             <span style={{ color: "#047857", fontWeight: 700 }}>
-                              ${item.unitPrice.toFixed(2)}
+                              {formatCurrency(item.unitPrice)}
                             </span>
                           </div>
 
@@ -3365,7 +3365,7 @@ export default function OrbitApp() {
                         Cart Total:
                       </span>
                       <span style={{ fontSize: "1.3rem", fontWeight: 900, color: "#003087" }}>
-                        ${cartTotal.toFixed(2)}
+                        {formatCurrency(cartTotal)}
                       </span>
                     </div>
 
@@ -3420,7 +3420,7 @@ export default function OrbitApp() {
                       >
                         {tags.map((t) => (
                           <option key={t.id} value={t.id}>
-                            {t.name} (Limit: ${t.monthlyLimit.toFixed(2)})
+                            {t.name} (Limit: {formatCurrency(t.monthlyLimit)})
                           </option>
                         ))}
                       </select>
@@ -3441,7 +3441,7 @@ export default function OrbitApp() {
                           }}
                         >
                           <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#166534" }}>
-                            Limit ($):
+                            Limit ({currencyRates[selectedCurrency]?.symbol || "$"}):
                           </span>
                           <input
                             type="number"
@@ -3479,8 +3479,8 @@ export default function OrbitApp() {
                         }}
                       >
                         🚨 <strong>Budget Exceeded:</strong> Cart will push {activeSelectedTag?.name}{" "}
-                        to ${cartImpactProjected.toFixed(2)} (limit: $
-                        {activeSelectedTag?.monthlyLimit.toFixed(2)})!
+                        to {formatCurrency(cartImpactProjected)} (limit:{" "}
+                        {formatCurrency(activeSelectedTag?.monthlyLimit)})!
                       </div>
                     )}
                     {isOver80 && (
