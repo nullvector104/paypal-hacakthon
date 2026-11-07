@@ -1803,22 +1803,22 @@ export default function OrbitApp() {
               background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
               color: "#ffffff",
               border: "1px solid rgba(255, 255, 255, 0.35)",
-              padding: "0.4rem 0.95rem",
+              padding: "0.5rem 1.15rem",
               borderRadius: "9999px",
-              fontSize: "0.84rem",
+              fontSize: "0.88rem",
               fontWeight: 800,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "0.45rem",
+              gap: "0.5rem",
               boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
               transition: "all 0.2s ease",
             }}
             title="Toggle Orbit AI Copilot"
           >
-            <span style={{ fontSize: "1rem" }}>✨</span>
+            <span style={{ fontSize: "1.05rem" }}>✨</span>
             <span>Copilot</span>
-            <span style={{ fontSize: "0.72rem", background: "rgba(255,255,255,0.2)", padding: "0.1rem 0.4rem", borderRadius: "4px" }}>
+            <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.2)", padding: "0.15rem 0.45rem", borderRadius: "4px" }}>
               {copilotOpen ? "Close ✕" : "Open ➔"}
             </span>
           </button>
@@ -1826,7 +1826,7 @@ export default function OrbitApp() {
           {/* Global Currency Switcher Capsule */}
           <div
             className="role-switcher-capsule"
-            style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)" }}
+            style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)", padding: "0.25rem 0.35rem" }}
             title="Switch Global Display Currency"
           >
             {(["USD", "EUR", "GBP"] as SupportedCurrency[]).map((cur) => (
@@ -1837,8 +1837,8 @@ export default function OrbitApp() {
                 style={{
                   background: selectedCurrency === cur ? "#0070ba" : "transparent",
                   color: selectedCurrency === cur ? "#ffffff" : "rgba(255,255,255,0.8)",
-                  fontSize: "0.78rem",
-                  padding: "0.25rem 0.6rem",
+                  fontSize: "0.82rem",
+                  padding: "0.32rem 0.75rem",
                   fontWeight: 800,
                 }}
                 onClick={() => {
@@ -1852,10 +1852,11 @@ export default function OrbitApp() {
           </div>
 
           {/* Demo Role Switcher Capsule */}
-          <div className="role-switcher-capsule" title="Toggle Demo User Role">
+          <div className="role-switcher-capsule" style={{ padding: "0.25rem 0.35rem" }} title="Toggle Demo User Role">
             <button
               type="button"
               className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
+              style={{ padding: "0.32rem 0.85rem", fontSize: "0.82rem" }}
               onClick={() => setRole("TREASURER")}
             >
               Treasurer
@@ -1863,22 +1864,12 @@ export default function OrbitApp() {
             <button
               type="button"
               className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
+              style={{ padding: "0.32rem 0.85rem", fontSize: "0.82rem" }}
               onClick={() => setRole("MEMBER")}
             >
               Member
             </button>
           </div>
-
-          {/* Notifications Bell */}
-          <button type="button" className="icon-nav-btn" title="2 Unread Notifications">
-            <span>🔔</span>
-            <span className="icon-badge">2</span>
-          </button>
-
-          {/* Settings Gear */}
-          <button type="button" className="icon-nav-btn" title="Settings">
-            <span>⚙️</span>
-          </button>
 
           {/* Log Out */}
           <button
