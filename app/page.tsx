@@ -2369,7 +2369,7 @@ export default function OrbitApp() {
                           >
                             {clubs.map((c) => (
                               <option key={c.id} value={c.id}>
-                                🏢 {c.name} (${c.balance.toFixed(2)})
+                                🏢 {c.name} ({formatCurrency(c.balance)})
                               </option>
                             ))}
                             <option value="__ADD_NEW__" style={{ color: "#4f46e5", fontWeight: "bold" }}>
@@ -2449,7 +2449,7 @@ export default function OrbitApp() {
                           marginTop: "0.2rem",
                         }}
                       >
-                        ${activeClub ? activeClub.balance.toFixed(2) : "1,480.00"}
+                        {formatCurrency(activeClub ? activeClub.balance : 1480)}
                       </p>
                     </div>
 
@@ -4871,7 +4871,7 @@ export default function OrbitApp() {
                     >
                       {clubs.map((c) => (
                         <option key={c.id} value={c.id} style={{ color: "#0f172a", background: "#ffffff" }}>
-                          🏢 {c.name} — ${c.balance.toFixed(2)} ({c.members?.length || 0} members)
+                          🏢 {c.name} — {formatCurrency(c.balance)} ({c.members?.length || 0} members)
                         </option>
                       ))}
                       <option value="__ADD_NEW__" style={{ color: "#4f46e5", fontWeight: "bold", background: "#f5f3ff" }}>
@@ -4923,7 +4923,7 @@ export default function OrbitApp() {
                   Vault Balance (Ledger-Computed)
                 </span>
                 <p style={{ fontSize: "1.85rem", fontWeight: 900, marginTop: "0.15rem" }}>
-                  ${activeClub.balance.toFixed(2)}
+                  {formatCurrency(activeClub.balance)}
                 </p>
                 <span style={{ fontSize: "0.72rem", opacity: 0.8 }}>
                   +{activeClub.members.length} Active Members
@@ -4995,10 +4995,9 @@ export default function OrbitApp() {
                           Total Collected
                         </span>
                         <p style={{ fontSize: "1.4rem", fontWeight: 900, color: "#15803d", marginTop: "0.2rem" }}>
-                          +${movements
+                          +{formatCurrency(movements
                             .filter((m) => m.clubId === activeClub.id && m.direction === "INCOMING" && m.status === "COMPLETED")
-                            .reduce((sum, m) => sum + m.amount, 0)
-                            .toFixed(2)}
+                            .reduce((sum, m) => sum + m.amount, 0))}
                         </p>
                         <span style={{ fontSize: "0.72rem", color: "#166534" }}>Dues & donations</span>
                       </div>
@@ -5008,10 +5007,9 @@ export default function OrbitApp() {
                           Total Disbursed
                         </span>
                         <p style={{ fontSize: "1.4rem", fontWeight: 900, color: "#b91c1c", marginTop: "0.2rem" }}>
-                          -${movements
+                          -{formatCurrency(movements
                             .filter((m) => m.clubId === activeClub.id && m.direction === "OUTGOING" && m.status === "COMPLETED")
-                            .reduce((sum, m) => sum + m.amount, 0)
-                            .toFixed(2)}
+                            .reduce((sum, m) => sum + m.amount, 0))}
                         </p>
                         <span style={{ fontSize: "0.72rem", color: "#991b1b" }}>Reimbursements & payouts</span>
                       </div>
@@ -5021,7 +5019,7 @@ export default function OrbitApp() {
                           Net Vault Balance
                         </span>
                         <p style={{ fontSize: "1.4rem", fontWeight: 900, color: "#4338ca", marginTop: "0.2rem" }}>
-                          ${activeClub.balance.toFixed(2)}
+                          {formatCurrency(activeClub.balance)}
                         </p>
                         <span style={{ fontSize: "0.72rem", color: "#3730a3" }}>Available in vault</span>
                       </div>
@@ -5283,7 +5281,7 @@ export default function OrbitApp() {
                               <div className="tag-bar-header">
                                 <span className="tag-name-bold">{t.name}</span>
                                 <span className="tag-numbers-text">
-                                  ${t.spent.toFixed(2)} / ${t.monthlyLimit.toFixed(2)}
+                                  {formatCurrency(t.spent)} / {formatCurrency(t.monthlyLimit)}
                                 </span>
                               </div>
                               <div className="tag-track-bg">
@@ -5537,10 +5535,10 @@ export default function OrbitApp() {
 
                             <div style={{ textAlign: "right" }}>
                               <div style={{ fontSize: "2rem", fontWeight: 900, color: "#4338ca" }}>
-                                ${activeEvent.totalCollected.toFixed(2)}
+                                {formatCurrency(activeEvent.totalCollected)}
                               </div>
                               <div style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: 600 }}>
-                                raised of ${activeEvent.goalAmount.toFixed(2)} goal
+                                raised of {formatCurrency(activeEvent.goalAmount)} goal
                               </div>
                             </div>
                           </div>
@@ -5551,7 +5549,7 @@ export default function OrbitApp() {
                               <span style={{ color: "#4338ca" }}>{activeEvent.progressPercent}% Funded</span>
                               <span style={{ color: activeEvent.remaining > 0 ? "#64748b" : "#059669" }}>
                                 {activeEvent.remaining > 0
-                                  ? `$${activeEvent.remaining.toFixed(2)} remaining to goal`
+                                  ? `${formatCurrency(activeEvent.remaining)} remaining to goal`
                                   : "Goal 100% completed!"}
                               </span>
                             </div>
@@ -5589,8 +5587,8 @@ export default function OrbitApp() {
                                 fontWeight: 600,
                               }}
                             >
-                              <span>$0.00</span>
-                              <span>Target: ${activeEvent.goalAmount.toFixed(2)}</span>
+                              <span>{formatCurrency(0)}</span>
+                              <span>Target: {formatCurrency(activeEvent.goalAmount)}</span>
                             </div>
                           </div>
                         </div>
@@ -5644,7 +5642,7 @@ export default function OrbitApp() {
                                         transition: "all 0.15s ease",
                                       }}
                                     >
-                                      ${preset}
+                                      {formatCurrency(preset)}
                                     </button>
                                   ))}
                                 </div>
@@ -5652,7 +5650,7 @@ export default function OrbitApp() {
 
                               <div className="form-group-field">
                                 <label className="form-field-label">
-                                  Contribution Amount ($ USD)
+                                  Contribution Amount ({currencyRates[selectedCurrency]?.label || "$ USD"})
                                 </label>
                                 <input
                                   type="number"
@@ -5728,7 +5726,7 @@ export default function OrbitApp() {
                               >
                                 {donatingToEvent
                                   ? "Processing PayPal Order..."
-                                  : `🚀 Contribute $${parseFloat(eventDonationAmount || "0").toFixed(2)} with PayPal Order`}
+                                  : `🚀 Contribute ${formatCurrency(eventDonationAmount || "0")} with PayPal Order`}
                               </button>
                             </form>
                           </div>
@@ -5785,7 +5783,7 @@ export default function OrbitApp() {
                                           borderRadius: "6px",
                                         }}
                                       >
-                                        +${donor.amount.toFixed(2)}
+                                        +{formatCurrency(donor.amount)}
                                       </span>
                                     </div>
                                   </div>
@@ -5839,7 +5837,7 @@ export default function OrbitApp() {
                       </div>
                       <div className="form-group-field">
                         <label className="form-field-label">
-                          Goal Amount ($)
+                          Goal Amount ({currencyRates[selectedCurrency]?.symbol || "$"})
                         </label>
                         <input
                           type="number"
@@ -5919,7 +5917,7 @@ export default function OrbitApp() {
 
                       <div style={{ flex: 1, minWidth: "120px" }}>
                         <label style={{ fontSize: "0.78rem", fontWeight: 700, color: "var(--text-secondary)", display: "block", marginBottom: "0.3rem" }}>
-                          Amount Per Member ($):
+                          Amount Per Member ({currencyRates[selectedCurrency]?.symbol || "$"}):
                         </label>
                         <input
                           type="number"
@@ -5993,7 +5991,7 @@ export default function OrbitApp() {
                           <div>
                             <h3 className="section-card-title">{cycle.title}</h3>
                             <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-                              ${cycle.amount.toFixed(2)} / member • Due by:{" "}
+                              {formatCurrency(cycle.amount)} / member • Due by:{" "}
                               <strong>{new Date(cycle.dueDate).toLocaleDateString()}</strong>
                               {cycle.isPastDueDate && (
                                 <span style={{ color: "#b91c1c", fontWeight: 700, marginLeft: "0.5rem" }}>
@@ -6008,7 +6006,7 @@ export default function OrbitApp() {
                               Collection Progress
                             </span>
                             <p style={{ fontWeight: 800, color: "#166534", fontSize: "1.1rem" }}>
-                              ${cycle.totalCollected.toFixed(2)} / ${cycle.totalExpected.toFixed(2)}
+                              {formatCurrency(cycle.totalCollected)} / {formatCurrency(cycle.totalExpected)}
                             </p>
                           </div>
                         </div>
@@ -6052,7 +6050,7 @@ export default function OrbitApp() {
                                     </span>
                                   </td>
                                   <td style={{ padding: "0.65rem 0.8rem", fontWeight: 800 }}>
-                                    ${st.amount.toFixed(2)}
+                                    {formatCurrency(st.amount)}
                                   </td>
                                   <td style={{ padding: "0.65rem 0.8rem" }}>
                                     <span
@@ -6169,7 +6167,7 @@ export default function OrbitApp() {
                       >
                         {tags.map((t) => (
                           <option key={t.id} value={t.id}>
-                            {t.name} (Limit: ${t.monthlyLimit.toFixed(2)})
+                            {t.name} (Limit: {formatCurrency(t.monthlyLimit)})
                           </option>
                         ))}
                       </select>
@@ -6263,7 +6261,7 @@ export default function OrbitApp() {
 
                               <div style={{ textAlign: "right" }}>
                                 <span style={{ fontSize: "1.15rem", fontWeight: 900, color: "var(--text-main)" }}>
-                                  ${cl.amount.toFixed(2)}
+                                  {formatCurrency(cl.amount)}
                                 </span>
                                 <div>
                                   <span
@@ -6403,7 +6401,7 @@ export default function OrbitApp() {
 
                             <div className="activity-mini-right">
                               <span className={`activity-mini-amount ${m.direction === "OUTGOING" ? "outgoing" : "incoming"}`}>
-                                {m.direction === "OUTGOING" ? "-" : "+"} ${m.amount.toFixed(2)}
+                                {m.direction === "OUTGOING" ? "-" : "+"} {formatCurrency(m.amount)}
                               </span>
                               <span className={`status-badge-mini ${m.status.toLowerCase()}`}>
                                 {m.status}
@@ -6518,7 +6516,7 @@ export default function OrbitApp() {
                 Conflict-of-Interest Safeguard:
               </p>
               <p style={{ fontSize: "0.82rem", color: "#b45309", marginTop: "0.25rem", lineHeight: "1.4" }}>
-                You are approving a reimbursement claim submitted by yourself (<strong>{claimToApprove.requesterEmail}</strong>) for <strong>${claimToApprove.amount.toFixed(2)}</strong>.
+                You are approving a reimbursement claim submitted by yourself (<strong>{claimToApprove.requesterEmail}</strong>) for <strong>{formatCurrency(claimToApprove.amount)}</strong>.
               </p>
             </div>
 
@@ -6541,7 +6539,7 @@ export default function OrbitApp() {
                   style={{ marginTop: "0.2rem" }}
                 />
                 <span>
-                  <strong>I certify under club honor code</strong> that this expense (${claimToApprove.amount.toFixed(2)} - &ldquo;{claimToApprove.note}&rdquo;) is legitimate, verified by receipt, and solely for club operations. This approval will be logged as an immutable high-priority event in the club audit trail.
+                  <strong>I certify under club honor code</strong> that this expense ({formatCurrency(claimToApprove.amount)} - &ldquo;{claimToApprove.note}&rdquo;) is legitimate, verified by receipt, and solely for club operations. This approval will be logged as an immutable high-priority event in the club audit trail.
                 </span>
               </label>
             </div>
