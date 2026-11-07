@@ -1022,19 +1022,40 @@ body {
   color: var(--text-secondary);
 }
 
+.form-input,
 .form-input-text {
+  width: 100%;
   background: #f8fafc;
   border: 1.5px solid #d1d5db;
-  border-radius: 10px;
-  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
   font-size: 0.95rem;
-  color: var(--text-main);
+  color: #0f172a;
   outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+  font-family: inherit;
 }
 
+.form-input:hover,
+.form-input-text:hover {
+  border-color: #94a3b8;
+  background: #ffffff;
+}
+
+.form-input:focus,
 .form-input-text:focus {
   border-color: #0070ba;
   background: #ffffff;
+  box-shadow: 0 0 0 3.5px rgba(0, 112, 186, 0.16);
+}
+
+.form-input:disabled,
+.form-input-text:disabled {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+  border-color: #e2e8f0;
 }
 
 /* FOOTER */

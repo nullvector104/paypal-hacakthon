@@ -3670,8 +3670,8 @@ export default function OrbitApp() {
               <form onSubmit={handleCreateSplit} style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "1.5rem" }}>
                 {/* Form Controls */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "0.3rem" }}>
+                  <div className="form-group-field">
+                    <label className="form-field-label">
                       Expense / Bill Title
                     </label>
                     <input
@@ -3679,13 +3679,13 @@ export default function OrbitApp() {
                       required
                       value={splitTitle}
                       onChange={(e) => setSplitTitle(e.target.value)}
-                      className="form-input"
+                      className="form-input-text"
                       placeholder="e.g. Team Dinner, Circuit Boards, Uber"
                     />
                   </div>
 
-                  <div>
-                    <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "0.3rem" }}>
+                  <div className="form-group-field">
+                    <label className="form-field-label">
                       Total Bill Amount ($ USD)
                     </label>
                     <input
@@ -3695,7 +3695,7 @@ export default function OrbitApp() {
                       required
                       value={splitTotal}
                       onChange={(e) => setSplitTotal(e.target.value)}
-                      className="form-input"
+                      className="form-input-text"
                       placeholder="90.00"
                       style={{ fontSize: "1.1rem", fontWeight: 800 }}
                     />
@@ -5420,8 +5420,8 @@ export default function OrbitApp() {
                                 </div>
                               </div>
 
-                              <div>
-                                <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "0.4rem" }}>
+                              <div className="form-group-field">
+                                <label className="form-field-label">
                                   Contribution Amount ($ USD)
                                 </label>
                                 <input
@@ -5431,15 +5431,15 @@ export default function OrbitApp() {
                                   required
                                   value={eventDonationAmount}
                                   onChange={(e) => setEventDonationAmount(e.target.value)}
-                                  className="form-input"
+                                  className="form-input-text"
                                   placeholder="25.00"
                                   style={{ fontWeight: 800, fontSize: "1.1rem" }}
                                 />
                               </div>
 
                               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
-                                <div>
-                                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "0.4rem" }}>
+                                <div className="form-group-field">
+                                  <label className="form-field-label">
                                     Your Name / Sponsor
                                   </label>
                                   <input
@@ -5447,12 +5447,12 @@ export default function OrbitApp() {
                                     required
                                     value={eventDonorName}
                                     onChange={(e) => setEventDonorName(e.target.value)}
-                                    className="form-input"
+                                    className="form-input-text"
                                     placeholder="Alex Vance"
                                   />
                                 </div>
-                                <div>
-                                  <label style={{ display: "block", fontSize: "0.82rem", fontWeight: 700, color: "var(--text-secondary)", marginBottom: "0.4rem" }}>
+                                <div className="form-group-field">
+                                  <label className="form-field-label">
                                     Your Email
                                   </label>
                                   <input
@@ -5460,7 +5460,7 @@ export default function OrbitApp() {
                                     required
                                     value={eventDonorEmail}
                                     onChange={(e) => setEventDonorEmail(e.target.value)}
-                                    className="form-input"
+                                    className="form-input-text"
                                     placeholder="donor@example.com"
                                   />
                                 </div>
@@ -5580,33 +5580,33 @@ export default function OrbitApp() {
                     </div>
 
                     <form onSubmit={handleCreateEvent} style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 0.8fr auto", gap: "1rem", alignItems: "flex-end" }}>
-                      <div>
-                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.3rem" }}>
-                          Event / Campaign Title
+                      <div className="form-group-field">
+                        <label className="form-field-label">
+                          Campaign Title
                         </label>
                         <input
                           type="text"
                           required
                           value={newEventTitle}
                           onChange={(e) => setNewEventTitle(e.target.value)}
-                          className="form-input"
+                          className="form-input-text"
                           placeholder="e.g. Tokyo Robotics Finals 2026"
                         />
                       </div>
-                      <div>
-                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.3rem" }}>
+                      <div className="form-group-field">
+                        <label className="form-field-label">
                           Description
                         </label>
                         <input
                           type="text"
                           value={newEventDesc}
                           onChange={(e) => setNewEventDesc(e.target.value)}
-                          className="form-input"
+                          className="form-input-text"
                           placeholder="Goal details..."
                         />
                       </div>
-                      <div>
-                        <label style={{ display: "block", fontSize: "0.8rem", fontWeight: 700, marginBottom: "0.3rem" }}>
+                      <div className="form-group-field">
+                        <label className="form-field-label">
                           Goal Amount ($)
                         </label>
                         <input
@@ -5616,7 +5616,7 @@ export default function OrbitApp() {
                           required
                           value={newEventGoal}
                           onChange={(e) => setNewEventGoal(e.target.value)}
-                          className="form-input"
+                          className="form-input-text"
                           placeholder="1200.00"
                         />
                       </div>
@@ -6182,7 +6182,7 @@ export default function OrbitApp() {
                     <div>
                       <h3 className="section-card-title">🔒 Append-Only Audit Trail</h3>
                       <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-                        Permanent record of all treasury actions (who, action, target, timestamp)
+                        Permanent record of all treasury actions (timestamp, user, role, and action)
                       </p>
                     </div>
                     <span
@@ -6208,30 +6208,28 @@ export default function OrbitApp() {
                       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.82rem" }}>
                         <thead>
                           <tr style={{ background: "#f8fafc", textAlign: "left", borderBottom: "1px solid #e2e8f0" }}>
-                            <th style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)" }}>Time (UTC)</th>
-                            <th style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)" }}>Who</th>
-                            <th style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)" }}>Role</th>
-                            <th style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)" }}>Action</th>
-                            <th style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)" }}>Target</th>
-                            <th style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)" }}>Details</th>
+                            <th style={{ padding: "0.65rem 0.85rem", color: "var(--text-secondary)" }}>Time</th>
+                            <th style={{ padding: "0.65rem 0.85rem", color: "var(--text-secondary)" }}>User / Authorized By</th>
+                            <th style={{ padding: "0.65rem 0.85rem", color: "var(--text-secondary)" }}>Role</th>
+                            <th style={{ padding: "0.65rem 0.85rem", color: "var(--text-secondary)" }}>Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {clubAuditLogs.map((log) => (
                             <tr key={log.id} style={{ borderBottom: "1px solid #f1f5f9" }}>
-                              <td style={{ padding: "0.55rem 0.75rem", color: "var(--text-muted)" }}>
+                              <td style={{ padding: "0.65rem 0.85rem", color: "var(--text-muted)", whiteSpace: "nowrap" }}>
                                 {new Date(log.createdAt).toLocaleString()}
                               </td>
-                              <td style={{ padding: "0.55rem 0.75rem", fontWeight: 700, color: "var(--text-main)" }}>
+                              <td style={{ padding: "0.65rem 0.85rem", fontWeight: 700, color: "var(--text-main)" }}>
                                 {log.who}
                               </td>
-                              <td style={{ padding: "0.55rem 0.75rem" }}>
+                              <td style={{ padding: "0.65rem 0.85rem" }}>
                                 <span
                                   style={{
                                     fontSize: "0.68rem",
                                     fontWeight: 800,
-                                    padding: "0.15rem 0.4rem",
-                                    borderRadius: "4px",
+                                    padding: "0.2rem 0.5rem",
+                                    borderRadius: "9999px",
                                     background: log.role === "TREASURER" ? "#e0e7ff" : "#f1f5f9",
                                     color: log.role === "TREASURER" ? "#4338ca" : "var(--text-secondary)",
                                   }}
@@ -6239,14 +6237,8 @@ export default function OrbitApp() {
                                   {log.role}
                                 </span>
                               </td>
-                              <td style={{ padding: "0.55rem 0.75rem", fontWeight: 700, color: log.action.includes("SELF") ? "#b91c1c" : "#1e1b4b" }}>
+                              <td style={{ padding: "0.65rem 0.85rem", fontWeight: 700, color: log.action.includes("SELF") ? "#b91c1c" : "#1e1b4b" }}>
                                 {log.action}
-                              </td>
-                              <td style={{ padding: "0.55rem 0.75rem", fontFamily: "monospace", color: "var(--text-muted)" }}>
-                                {log.target}
-                              </td>
-                              <td style={{ padding: "0.55rem 0.75rem", color: "var(--text-secondary)", maxWidth: "260px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                                {log.details || "—"}
                               </td>
                             </tr>
                           ))}
