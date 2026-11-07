@@ -1803,24 +1803,21 @@ export default function OrbitApp() {
               background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
               color: "#ffffff",
               border: "1px solid rgba(255, 255, 255, 0.35)",
-              padding: "0.5rem 1.15rem",
+              padding: "0.42rem 0.95rem",
               borderRadius: "9999px",
-              fontSize: "0.88rem",
+              fontSize: "0.84rem",
               fontWeight: 800,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "0.5rem",
+              gap: "0.4rem",
               boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
               transition: "all 0.2s ease",
             }}
             title="Toggle Orbit AI Copilot"
           >
-            <span style={{ fontSize: "1.05rem" }}>✨</span>
+            <span style={{ fontSize: "0.85rem" }}>✨</span>
             <span>Copilot</span>
-            <span style={{ fontSize: "0.74rem", background: "rgba(255,255,255,0.2)", padding: "0.15rem 0.45rem", borderRadius: "4px" }}>
-              {copilotOpen ? "Close ✕" : "Open ➔"}
-            </span>
           </button>
 
           {/* Global Currency Switcher Capsule */}
@@ -2530,23 +2527,25 @@ export default function OrbitApp() {
                 <div className="right-primary-actions">
                   <button
                     type="button"
-                    className="btn-navy-pill"
+                    className="btn-navy-pill btn-primary-send"
                     onClick={() => {
                       setSendIsClub(false);
                       setShowSendModal(true);
                     }}
                   >
-                    Send
+                    <span>💸</span>
+                    <span>Send</span>
                   </button>
                   <button
                     type="button"
-                    className="btn-navy-pill"
+                    className="btn-navy-pill btn-primary-request"
                     onClick={() => {
                       setReqIsClub(false);
                       setShowRequestModal(true);
                     }}
                   >
-                    Request
+                    <span>📩</span>
+                    <span>Request</span>
                   </button>
                 </div>
 

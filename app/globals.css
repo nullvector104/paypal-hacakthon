@@ -434,8 +434,41 @@ body {
 .right-primary-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  margin-bottom: 1.75rem;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.btn-primary-send,
+.btn-primary-request {
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  padding: 1.15rem 1.8rem !important;
+  border-radius: 9999px !important;
+  letter-spacing: 0.02em;
+  gap: 0.65rem !important;
+  box-shadow: 0 6px 18px rgba(0, 48, 135, 0.25) !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.btn-primary-send {
+  background: linear-gradient(135deg, #003087 0%, #0070ba 100%) !important;
+}
+
+.btn-primary-request {
+  background: #ffffff !important;
+  color: #003087 !important;
+  border: 2px solid #003087 !important;
+}
+
+.btn-primary-send:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 48, 135, 0.35) !important;
+}
+
+.btn-primary-request:hover {
+  background: #f0f7ff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 48, 135, 0.18) !important;
 }
 
 .btn-navy-pill {
