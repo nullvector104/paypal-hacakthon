@@ -2223,9 +2223,9 @@ export default function OrbitApp() {
                     <div>
                       <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", flexWrap: "wrap" }}>
                         <h3 className="section-card-title" style={{ margin: 0 }}>
-                          {activeClub ? activeClub.name : "Campus Club"} Treasury
+                          {activeClub ? activeClub.name : "Organization"} Treasury
                         </h3>
-                        {/* Club Dropdown Selector & Add Button */}
+                        {/* Organization Dropdown Selector & Add Button */}
                         <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
                           <select
                             className="club-scroll-select"
@@ -2239,21 +2239,21 @@ export default function OrbitApp() {
                               fontSize: "0.82rem",
                               fontWeight: 700,
                             }}
-                            title="Switch active club"
+                            title="Switch active organization or entity"
                           >
                             {clubs.map((c) => (
                               <option key={c.id} value={c.id}>
-                                🏛️ {c.name} (${c.balance.toFixed(2)})
+                                🏢 {c.name} (${c.balance.toFixed(2)})
                               </option>
                             ))}
                             <option value="__ADD_NEW__" style={{ color: "#4f46e5", fontWeight: "bold" }}>
-                              ➕ + Add New Club...
+                              ➕ + Add New Organization...
                             </option>
                           </select>
                           <button
                             type="button"
                             onClick={() => setShowAddClubModal(true)}
-                            title="Create a new campus club"
+                            title="Create a new organization / business entity"
                             style={{
                               background: "#f0fdf4",
                               border: "1.5px solid #86efac",
@@ -2274,7 +2274,7 @@ export default function OrbitApp() {
                         </div>
                       </div>
                       <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginTop: "0.25rem" }}>
-                        {activeClub?.description || "Campus organization treasury, dues collection & expense reimbursements"}
+                        {activeClub?.description || "Enterprise entity treasury, dues, receivables & operational disbursements"}
                       </p>
                     </div>
                     <span
@@ -4595,7 +4595,7 @@ export default function OrbitApp() {
                       textTransform: "uppercase",
                     }}
                   >
-                    Campus Community
+                    Enterprise Treasury
                   </span>
                   <span
                     style={{
@@ -4615,14 +4615,14 @@ export default function OrbitApp() {
                   {activeClub.name} Treasury
                 </h2>
                 <p style={{ opacity: 0.9, fontSize: "0.88rem", marginTop: "0.2rem", maxWidth: "600px" }}>
-                  {activeClub.description || "Autonomous campus organization treasury, dues & reimbursements"}
+                  {activeClub.description || "Autonomous multi-entity treasury, receivables & operational disbursements"}
                 </p>
 
                 {/* Club Dropdown Selector & Add New Club Button */}
                 <div style={{ display: "flex", alignItems: "center", gap: "0.6rem", marginTop: "0.85rem", flexWrap: "wrap" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: "0.4rem" }}>
                     <span style={{ fontSize: "0.78rem", fontWeight: 700, color: "rgba(255,255,255,0.75)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                      Switch Club:
+                      Switch Entity:
                     </span>
                     <select
                       className="club-scroll-select-dark"
@@ -4637,15 +4637,15 @@ export default function OrbitApp() {
                         fontWeight: 700,
                         backdropFilter: "blur(6px)",
                       }}
-                      title="Select or switch club"
+                      title="Select or switch organization"
                     >
                       {clubs.map((c) => (
                         <option key={c.id} value={c.id} style={{ color: "#0f172a", background: "#ffffff" }}>
-                          🏛️ {c.name} — ${c.balance.toFixed(2)} ({c.members?.length || 0} members)
+                          🏢 {c.name} — ${c.balance.toFixed(2)} ({c.members?.length || 0} members)
                         </option>
                       ))}
                       <option value="__ADD_NEW__" style={{ color: "#4f46e5", fontWeight: "bold", background: "#f5f3ff" }}>
-                        ➕ + Add New Club...
+                        ➕ + Add New Organization...
                       </option>
                     </select>
                   </div>
@@ -4667,7 +4667,7 @@ export default function OrbitApp() {
                       boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
                     }}
                   >
-                    <span>+</span> Add New Club
+                    <span>+</span> Add Organization
                   </button>
                 </div>
               </div>
@@ -5301,7 +5301,7 @@ export default function OrbitApp() {
                                 {activeEvent.title}
                               </h2>
                               <p style={{ color: "#475569", fontSize: "0.92rem", marginTop: "0.3rem", maxWidth: "680px" }}>
-                                {activeEvent.description || "Support this campus team initiative through the shared club ledger."}
+                                {activeEvent.description || "Support this organizational team initiative through the shared treasury ledger."}
                               </p>
                             </div>
 
@@ -6587,11 +6587,11 @@ export default function OrbitApp() {
           >
             <div className="modal-header-row">
               <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
-                <span style={{ fontSize: "1.5rem" }}>🏛️</span>
+                <span style={{ fontSize: "1.5rem" }}>🏢</span>
                 <div>
-                  <h3 className="modal-sheet-title" style={{ margin: 0 }}>Create New Campus Club</h3>
+                  <h3 className="modal-sheet-title" style={{ margin: 0 }}>Create New Organization / Entity</h3>
                   <p style={{ fontSize: "0.82rem", color: "#64748b", margin: 0 }}>
-                    Configure club vault, treasurer access, and monthly category budget
+                    Configure organization vault, officer governance, and monthly category budget
                   </p>
                 </div>
               </div>
@@ -6607,26 +6607,26 @@ export default function OrbitApp() {
             <form onSubmit={handleCreateClub} className="modal-form-stack" style={{ marginTop: "1rem" }}>
               <div className="form-group-field">
                 <label className="form-field-label">
-                  Club Name <span style={{ color: "#ef4444" }}>*</span>
+                  Organization / Entity Name <span style={{ color: "#ef4444" }}>*</span>
                 </label>
                 <input
                   type="text"
                   className="form-input-text"
                   value={newClubName}
                   onChange={(e) => setNewClubName(e.target.value)}
-                  placeholder="e.g. Photography Society, AI & Robotics Club, Chess Union"
+                  placeholder="e.g. Apex Robotics Labs, Global Design Guild, Frontier AI Syndicate"
                   required
                 />
               </div>
 
               <div className="form-group-field">
-                <label className="form-field-label">Club Description / Mission</label>
+                <label className="form-field-label">Organization Mission / Description</label>
                 <textarea
                   className="form-input-text"
                   rows={2}
                   value={newClubDescription}
                   onChange={(e) => setNewClubDescription(e.target.value)}
-                  placeholder="e.g. Official campus organization for workshops, equipment sharing & exhibitions."
+                  placeholder="e.g. Global autonomous research team handling collective procurement, grants & member disbursements."
                   style={{ resize: "vertical" }}
                 />
               </div>
@@ -6634,7 +6634,7 @@ export default function OrbitApp() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
                 <div className="form-group-field">
                   <label className="form-field-label">
-                    Treasurer Name <span style={{ color: "#ef4444" }}>*</span>
+                    Financial Officer Name <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <input
                     type="text"
@@ -6648,14 +6648,14 @@ export default function OrbitApp() {
 
                 <div className="form-group-field">
                   <label className="form-field-label">
-                    Treasurer Email <span style={{ color: "#ef4444" }}>*</span>
+                    Treasurer / Officer Email <span style={{ color: "#ef4444" }}>*</span>
                   </label>
                   <input
                     type="email"
                     className="form-input-text"
                     value={newClubTreasurerEmail}
                     onChange={(e) => setNewClubTreasurerEmail(e.target.value)}
-                    placeholder="treasurer@club.org"
+                    placeholder="treasurer@organization.org"
                     required
                   />
                 </div>
@@ -6671,14 +6671,14 @@ export default function OrbitApp() {
                     className="form-input-text"
                     value={newClubTagName}
                     onChange={(e) => setNewClubTagName(e.target.value)}
-                    placeholder="e.g. Club Operations"
+                    placeholder="e.g. Hardware R&D, Operational Supplies"
                     required
                   />
                 </div>
 
                 <div className="form-group-field">
                   <label className="form-field-label">
-                    Monthly Budget Limit ($)
+                    Monthly Budget Cap ($)
                   </label>
                   <input
                     type="number"
@@ -6687,7 +6687,7 @@ export default function OrbitApp() {
                     className="form-input-text"
                     value={newClubTagLimit}
                     onChange={(e) => setNewClubTagLimit(e.target.value)}
-                    placeholder="500.00"
+                    placeholder="1500.00"
                     required
                   />
                 </div>
@@ -6695,7 +6695,7 @@ export default function OrbitApp() {
 
               <div className="form-group-field">
                 <label className="form-field-label">
-                  Initial Treasury Vault Seed Deposit ($)
+                  Initial Treasury Vault Seed Funding ($)
                 </label>
                 <input
                   type="number"
@@ -6707,7 +6707,7 @@ export default function OrbitApp() {
                   placeholder="0.00"
                 />
                 <span style={{ fontSize: "0.76rem", color: "#64748b", marginTop: "0.25rem", display: "block" }}>
-                  💡 Optional initial funds deposited into the ledger so the club can approve claims right away.
+                  💡 Optional initial capital deposited into the ledger so the entity can approve claims and disbursements immediately.
                 </span>
               </div>
 
@@ -6734,7 +6734,7 @@ export default function OrbitApp() {
                     borderRadius: "8px",
                   }}
                 >
-                  {creatingClub ? "Creating Club..." : "✨ Create Club & Vault"}
+                  {creatingClub ? "Creating Organization..." : "✨ Create Entity & Vault"}
                 </button>
               </div>
             </form>
@@ -6761,7 +6761,7 @@ export default function OrbitApp() {
                     {selectedContactData.counterparty}
                   </h3>
                   <span style={{ fontSize: "0.75rem", opacity: 0.85 }}>
-                    {selectedContactData.isOrg ? "Organization / Vendor Account" : "Individual / Campus Member"}
+                    {selectedContactData.isOrg ? "Organization / Vendor Account" : "Individual / Team Member"}
                   </span>
                 </div>
               </div>

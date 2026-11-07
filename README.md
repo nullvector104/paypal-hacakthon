@@ -1,4 +1,4 @@
-# 🌌 Orbit — Autonomous Treasury, Multi-Club Finance & AI Commerce Prototype
+# 🌌 PayPal Orbit — Enterprise Multi-Entity Treasury, Global Spend Management & AI Autonomous Commerce
 
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
@@ -7,227 +7,230 @@
 [![PayPal](https://img.shields.io/badge/PayPal-Sandbox_APIs-003087?style=for-the-badge&logo=paypal)](https://developer.paypal.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-> ⚠️ **IMPORTANT DISCLAIMER FOR EVALUATORS & USERS:**  
-> **This project is strictly an independent sandbox prototype built for the PayPal AI Hackathon.**  
-> **NEVER use live PayPal credentials or real payment cards.**  
-> Anyone cloning or running this repository **must supply their own sandbox API credentials and PostgreSQL database**. No secrets, API keys, or live credentials are included in this repository.
+> ⚠️ **DEVELOPER & EVALUATION NOTICE:**  
+> **This project is an advanced prototype designed for the PayPal AI Global Hackathon.**  
+> It showcases the next generation of PayPal: bridging consumer checkouts with multi-organization corporate treasury, real-time ledger accounting, and AI agentic orchestration.  
+> **Always use sandbox accounts.** Never provide live PayPal production credentials.
 
 ---
 
-## 🎯 Executive Overview
+## 💡 The Problem with Modern Corporate & Organization Payments
 
-**Orbit** solves one of the messiest friction points in university campus clubs and student organizations: **fragmented group money, delayed member reimbursements, informal spreadsheets, and blind budget overspends.**
+Today, global businesses, distributed remote teams, non-profits, decentralized communities, and organizations juggle disjointed tools:
+* **Fragmented Payment Rails**: Corporate credit cards, manual wire transfers, batch payouts, and invoice tracking exist in isolated silos.
+* **Lack of Real-Time Spend Guardrails**: Department leads and teams discover budget overruns at month-end statement reconciliation rather than at the point of transaction.
+* **Complex Multi-Entity Management**: Organizations operating across multiple business units, branches, initiatives, or regional teams must juggle disparate logins and ledgers.
+* **Lack of Agentic Automation**: Traditional payment systems require manual invoice drafting, manual categorization, and repetitive approval chains.
 
-Orbit transforms campus finances into a cohesive, intelligent, and server-authoritative treasury ecosystem:
-1. **Interactive Multi-Club Switcher**: Seamlessly transition between campus student clubs (Robotics, Photography, Chess, etc.) or initialize new clubs with starting seed vaults in one click.
-2. **Unified Single-Source Ledger**: A strict PostgreSQL-backed money movement ledger tracking cart payments, peer transfers, dues invoices, and club payouts.
-3. **Multi-Rail PayPal Sandbox Integration**: Harnesses **Orders v2**, **Payouts v1**, and **Invoicing v2** with real-time server verification.
-4. **Autonomous AI Copilot & Natural Language Commands**: Parse intent, draft payment orders, recommend spending categories, and execute authorized financial operations with conversational AI.
-5. **Real-Time Budget Guardrails**: Visual category threshold alarms triggering dynamic warnings when spending approaches 80% or exceeds 100% of the monthly limit.
-6. **Delightful Payment Interactions**: Native celebratory tick-mark animations and confetti explosions upon payment captures.
+---
+
+## 🚀 The Solution: What is PayPal Orbit?
+
+**PayPal Orbit** is an enterprise-grade extension to the PayPal ecosystem that transforms PayPal from a transaction processor into a **comprehensive, autonomous treasury operating system**. 
+
+Orbit unifies commercial cart checkouts, peer-to-peer transfers, global contractor payouts, enterprise invoicing, and multi-entity vault management into a single **server-authoritative, immutable ledger**.
+
+### 🌟 Core Pillars
+
+1. **🏢 Multi-Organization / Entity Hub & Dynamic Switcher**
+   - Manage cross-organizational treasuries (e.g. *Global Engineering Org*, *Design & Media Collective*, *Operations & Facilities*, *Regional Subsidiaries*) from a unified command interface.
+   - Provision new organizations and initialize dedicated operational vaults with pre-allocated budgets in seconds.
+
+2. **⚡ Unified Multi-Rail Settlement Engine**
+   - **Point-of-Sale & Commerce (Orders v2)**: Instant inventory purchase and capture.
+   - **Global Vendor & Member Disbursements (Payouts v1)**: Direct bulk and single-recipient treasury disbursements with real-time vault balance deductions.
+   - **Receivables & B2B Billing (Invoicing v2)**: Programmatic invoice dispatch with direct `payer-view` settlement links.
+
+3. **🤖 Autonomous AI Financial Copilot (Agentic Action Execution)**
+   - Translates conversational human intent into validated, multi-step financial operations.
+   - Automatically parses counterparty history, drafts payment orders, assigns tax/accounting category tags, and halts for user confirmation before executing financial movements.
+
+4. **📊 Real-Time Proactive Budget Guardrails**
+   - Dynamic threshold monitoring on every category budget tag.
+   - Visual early-warning triggers at **80%** (Budget Warning) and hard circuit-breaker notifications at **100%** (Budget Exceeded) before funds leave the vault.
+
+5. **🛡️ Server-Enforced Role Governance & Immutable Audit Logging**
+   - Cryptographic server verification distinguishing **Treasurer / Financial Officer** privileges from **Member / Team Contributor** access.
+   - Append-only immutable audit trail ensuring zero unauthorized tampering.
 
 ---
 
 ## 🏛️ System Architecture
 
-Orbit is architected with a **Server-Authoritative Ledger Model** where balances and permissions are strictly computed on the backend to prevent tampering or race conditions:
+Orbit employs a **Server-Authoritative Ledger Architecture**, ensuring financial truth is strictly maintained on the backend:
 
 ```mermaid
 flowchart TD
-    User([👤 User / Treasurer / Member]) <--> NextUI[🖥️ Next.js 15 Client App]
+    User([👤 Global User / Financial Officer / Team Member]) <--> ClientApp[🖥️ Next.js 15 Enterprise Client]
     
-    subgraph ClientLayer [Client Experience]
-        NextUI <--> AICopilot[✨ Orbit AI Copilot]
-        NextUI <--> ClubSwitcher[🏛️ Multi-Club Selector]
-        NextUI <--> BudgetAlarms[📊 80% / 100% Budget Alarms]
+    subgraph ExperienceLayer [Intelligent Experience Layer]
+        ClientApp <--> Copilot[✨ Orbit AI Agent / Copilot]
+        ClientApp <--> EntitySwitcher[🏢 Multi-Organization Selector]
+        ClientApp <--> BudgetEngine[📊 Real-Time Threshold Guardrails]
+        ClientApp <--> FeedbackUI[🎉 Interactive Motion & Feedback UI]
     end
 
-    NextUI <--> ServerRoutes[⚡ Server-Side API Routes]
+    ClientApp <--> APIRoutes[⚡ Serverless API Route Handlers]
 
-    subgraph BackendLayer [Server-Authoritative Core]
-        ServerRoutes <--> RoleGuard{🛡️ Role Enforcement<br/>Treasurer vs Member}
-        RoleGuard -- Authorized --> Ledger[📖 Unified Movement Ledger]
-        ServerRoutes <--> AuditLog[🔒 Append-Only Audit Trail]
-        Ledger <--> Prisma[Prisma ORM Client]
-        Prisma <--> NeonDB[(🐘 Neon Serverless PostgreSQL)]
+    subgraph SecurityCore [Server-Authoritative Governance Core]
+        APIRoutes <--> AuthGuard{🛡️ RBAC Policy Engine<br/>Officer vs Contributor}
+        AuthGuard -- Authorized --> LedgerCore[📖 Unified Movement Ledger]
+        APIRoutes <--> AuditTrail[🔒 Append-Only Immutable Audit Log]
+        LedgerCore <--> PrismaORM[Prisma ORM Client]
+        PrismaORM <--> CloudPostgres[(🐘 High-Availability PostgreSQL)]
     end
 
-    subgraph ExternalServices [External Integrations]
-        ServerRoutes <-->|Orders v2 API| PPOorders[💳 PayPal Checkout]
-        ServerRoutes <-->|Payouts v1 API| PPPayouts[💸 PayPal Member Payouts]
-        ServerRoutes <-->|Invoicing v2 API| PPInvoices[📄 PayPal Invoices & Dues]
-        ServerRoutes <-->|E-Commerce Search| Channel3[🛒 Channel3 Product API]
-        AICopilot <-->|Function Calling| LLMProvider[🧠 Google Gemini / OpenAI]
+    subgraph ExternalEcosystem [PayPal Global Infrastructure & AI]
+        APIRoutes <-->|Orders v2 API| PPOrders[💳 PayPal Global Checkout]
+        APIRoutes <-->|Payouts v1 API| PPPayouts[💸 PayPal Global Payouts]
+        APIRoutes <-->|Invoicing v2 API| PPInvoices[📄 PayPal Enterprise Invoicing]
+        APIRoutes <-->|Commerce Catalog| Channel3API[🛒 Channel3 E-Commerce Engine]
+        Copilot <-->|Function Calling| LLMPlatform[🧠 Advanced LLM Reasoning Engine]
     end
 ```
 
 ---
 
-## ✨ Key Features Breakdown
+## 📊 Unified Ledger Schema (`Movement` Model)
 
-### 1. 🏛️ Multi-Club Dropdown Switcher & Creation Modal
-- Switch between campus organizations (e.g., Robotics Club, Photography Society, Chess Union) via an intuitive scrollable dropdown.
-- **Create New Club Modal**: Input club name, description, designated treasurer name/email, initial budget category, monthly limit, and an optional seed vault deposit.
-- All vault balances are dynamically computed from transaction logs—preventing state drift.
+Every monetary transaction across all entities flows through a single server-validated ledger model:
 
-### 2. 💳 Multi-Rail PayPal Sandbox Integration
-- **Direct Checkout (Orders v2)**: Real-time cart calculation and automated capture with PayPal personal sandbox accounts.
-- **Member Reimbursements (Payouts v1)**: Instant disbursement directly from the sandbox business account to approved claimants.
-- **Membership Dues (Invoicing v2)**: Creates and dispatches sandbox invoices with direct `payer-view` payment URLs; marks dues paid upon settlement.
-- **Server-Enforced Role Security**: High-risk actions (initiating payouts, approving reimbursement claims) verify `userRole === "TREASURER"`; unprivileged member attempts are blocked with `403 Forbidden`.
-
-### 3. 🤖 Natural Language AI Copilot
-- Conversational financial assistant powered by modern LLM tool calling.
-- Translates plain English prompts (e.g., *"Pay $45 to alex@campus.org for sensors from Robotics vault"*) into structured payment drafts.
-- Requires explicit user confirmation before any financial movement is executed.
-
-### 4. 📊 Category Budgeting & Threshold Alerts
-- Categorized expense tags with configurable monthly spending caps.
-- Dynamic visual alerts trigger when category spending crosses **80%** (Warning) or **100%** (Limit Exceeded).
+| Field | Type | Description |
+|---|---|---|
+| `id` | `String (CUID)` | Global unique transaction identifier |
+| `type` | `Enum` | `CART_PAYMENT` \| `SEND` \| `REQUEST` \| `CLUB_DUES` \| `CLUB_PAYOUT` |
+| `direction` | `Enum` | `OUTGOING` (Disbursements, Purchases) \| `INCOMING` (Receivables, Invoices) |
+| `counterparty` | `String` | Authenticated recipient email, vendor name, or corporate billing address |
+| `amount` | `Float` | Server-validated transaction total |
+| `currency` | `String` | Multi-currency indicator (`USD`, `EUR`, `GBP`) |
+| `tagId` | `FK -> Tag` | Linked corporate accounting category tag |
+| `status` | `Enum` | `PENDING` $\rightarrow$ `COMPLETED` \| `FAILED` \| `CANCELLED` |
+| `paypalRefId` | `String (Unique)` | PayPal Order ID, Payout Item ID, or Invoice ID |
+| `clubId` | `FK -> Club` | Associated Organization / Subsidiary Vault |
+| `createdAt` | `DateTime` | Immutable UTC transaction timestamp |
 
 ---
 
 ## 🔑 Setting Up Your Own Sandbox Credentials
 
-Orbit requires **your own API keys and accounts** to run locally. Follow the steps below to configure your sandbox environment.
+Orbit requires **your own API keys and accounts** to run in sandbox mode:
 
-### 1. PayPal Developer Sandbox Account
-1. Log in to the [PayPal Developer Dashboard](https://developer.paypal.com/).
-2. Navigate to **Testing Tools** $\rightarrow$ **Sandbox Accounts**:
-   - You need one **Business Account** (acts as the merchant / club vault sender).
-   - You need at least one **Personal Account** (acts as the student buyer / member).
-3. Navigate to **Apps & Credentials** $\rightarrow$ select **Sandbox** $\rightarrow$ click **Create App**.
-4. Copy the following credentials:
-   - **Client ID**
-   - **Secret**
+### 1. PayPal Developer Sandbox
+1. Go to the [PayPal Developer Dashboard](https://developer.paypal.com/).
+2. Create or verify:
+   - **One Business Account** (represents the enterprise treasury vault sender).
+   - **One Personal Account** (represents a buyer, employee, or billing recipient).
+3. Under **Apps & Credentials**, create a Sandbox App and retrieve:
+   - `PAYPAL_CLIENT_ID`
+   - `PAYPAL_CLIENT_SECRET`
 
-### 2. Neon Serverless PostgreSQL Database
-1. Create a free PostgreSQL instance at [Neon.tech](https://neon.tech).
-2. Copy the pooled connection string (`postgresql://user:pass@ep-xyz.neon.tech/neondb?sslmode=require`).
+### 2. Cloud PostgreSQL Database (Neon)
+1. Provision a free PostgreSQL instance on [Neon.tech](https://neon.tech).
+2. Copy your connection URL (`postgresql://user:pass@ep-sample.neon.tech/neondb?sslmode=require`).
 
-### 3. Google Gemini or OpenAI API Key
-1. Generate a free API key at [Google AI Studio](https://aistudio.google.com/) (recommended) or OpenAI.
+### 3. AI / LLM Reasoning Engine
+1. Obtain an API key from [Google AI Studio](https://aistudio.google.com/) for Gemini models, or OpenAI.
 
 ---
 
 ## 🚀 Quickstart Guide
 
-### 1. Clone the Repository
+### 1. Clone & Configure
 ```bash
 git clone https://github.com/nullvector104/paypal-hacakthon.git
 cd paypal-hacakthon
 ```
 
-### 2. Configure Environment Variables
-Copy `.env.example` to create your local `.env.local`:
+Copy the environment template:
 ```bash
-# Windows PowerShell
+# Windows
 copy .env.example .env.local
 
 # macOS / Linux
 cp .env.example .env.local
 ```
 
-Open `.env.local` in your editor and fill in your actual credentials:
+Populate `.env.local` with your sandbox keys:
 ```env
-# ==========================================
-# Database (PostgreSQL - Neon recommended)
-# ==========================================
-DATABASE_URL="postgresql://<user>:<password>@<neon-host>/neondb?sslmode=require"
+# Database
+DATABASE_URL="postgresql://user:password@ep-sample.neon.tech/neondb?sslmode=require"
 
-# ==========================================
-# PayPal Sandbox Credentials
-# ==========================================
+# PayPal Sandbox
 PAYPAL_API_BASE="https://api-m.sandbox.paypal.com"
 PAYPAL_CLIENT_ID="your_sandbox_client_id_here"
 PAYPAL_CLIENT_SECRET="your_sandbox_client_secret_here"
 NEXT_PUBLIC_PAYPAL_CLIENT_ID="your_sandbox_client_id_here"
 
-# Webhook ID (Optional - from PayPal Dashboard Webhooks)
+# Webhooks (Optional)
 PAYPAL_WEBHOOK_ID="your_webhook_id_here"
 
-# ==========================================
-# AI / LLM Provider Configuration
-# ==========================================
+# AI Reasoning Engine
 LLM_PROVIDER="gemini"
 LLM_MODEL="gemini-2.5-flash"
-LLM_API_KEY="your_gemini_api_key_here"
-
-# ==========================================
-# Channel3 Product Search API (Optional)
-# ==========================================
-CHANNEL3_API_KEY="your_channel3_api_key_here"
+LLM_API_KEY="your_ai_api_key_here"
 ```
 
-> [!NOTE]
-> `.env.local` is listed in `.gitignore` and will never be committed to Git.
-
-### 3. Install Dependencies & Generate Prisma Client
+### 2. Install & Sync Schema
 ```bash
 npm install
 npx prisma generate
 npx prisma db push
 ```
 
-*(Optional)* Seed sample clubs, categories, and test data:
-```bash
-npx prisma db seed
-```
-
-### 4. Run the Local Development Server
+### 3. Launch Development Server
 ```bash
 npm run dev
-# Or on Windows PowerShell if execution policies restrict scripts:
+# Or on Windows if PowerShell restricts scripts:
 cmd /c "npm run dev"
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to view the application!
+Access the dashboard at [http://localhost:3000](http://localhost:3000).
 
 ---
 
-## 🧪 Testing the Flows in Sandbox Mode
+## 🧪 Enterprise Verification Scenarios
 
-| Flow | How to Test | Expected Result |
+| Test Case | Interaction Steps | Expected Production Result |
 |---|---|---|
-| **Club Switcher & Creation** | Click the dropdown menu at the top of the Club section; select `+ Add New Club...` | Modal opens; submitting initializes a new club, designated treasurer, category tag, and updates the ledger. |
-| **Instant Dev Checkout** | In the Cart section, add items and click **⚡ Instant Dev Test Payment** | Captures order, updates activity ledger, triggers celebratory tick-mark animation. |
-| **PayPal Sandbox Checkout** | In the Cart section, click the standard PayPal Button | PayPal popup opens; sign in with your US Sandbox Personal buyer account to complete the order. |
-| **Send Money / Reimbursement** | Click `+ Send` in top bar; enter recipient email and amount | Disburses via PayPal Payouts v1; decrements club balance and records payout in unified ledger. |
-| **Request Dues / Invoicing** | Click `↓ Request` or `Request Dues`; submit amount and recipient email | Generates invoice via PayPal Invoicing v2; returns direct `payer-view` link in the ledger. |
-| **Role Guard Verification** | Toggle the role switcher in the top navigation from **Treasurer** to **Member** | Attempting to approve claims or request club dues triggers an immediate `403 Forbidden` response. |
+| **Multi-Entity Provisioning** | Click the Organization Selector $\rightarrow$ Choose `+ Add New Organization...` | Creates organization vault, designates lead financial officer, provisions budget tags, records initial seed funding in ledger. |
+| **Instant POS Checkout** | Add items from Catalog $\rightarrow$ Select **⚡ Instant Dev Test Payment** | Validates cart on server, captures order, updates ledger, displays celebratory tick-mark animation. |
+| **PayPal Sandbox Buyer Capture** | Select standard PayPal smart button $\rightarrow$ Authenticate with US Sandbox Personal account | Authorizes and captures order through PayPal Orders v2 sandbox endpoints. |
+| **Global Member Disbursement** | Click `+ Send` $\rightarrow$ Specify recipient, amount, category tag | Invokes PayPal Payouts v1; immediately deducts from organization vault balance and updates activity feed. |
+| **B2B Invoice Creation** | Click `↓ Request` $\rightarrow$ Submit billing invoice | Calls PayPal Invoicing v2; creates dynamic invoice with direct `payer-view` settlement link. |
+| **Role-Based Circuit Breaker** | Toggle top navigation switch to **Member View** $\rightarrow$ Attempt to approve claims or request funds | Action blocked with server-level `403 Forbidden` notification. |
 
 ---
 
-## 📁 Repository Structure
+## 📁 Project Architecture
 
 ```
 ├── app/
 │   ├── api/
-│   │   ├── ai/            # AI command & confirmation endpoints
-│   │   ├── cart/          # Cart management & calculations
-│   │   ├── clubs/         # Multi-club operations, dues, claims, ledger
+│   │   ├── ai/            # AI command parser & confirmation handlers
+│   │   ├── cart/          # Server-validated commerce operations
+│   │   ├── clubs/         # Multi-entity treasury, dues cycles, claims & ledger
 │   │   ├── movements/     # Unified money movement (Send, Request, Simulate)
-│   │   ├── orders/        # PayPal Orders v2 capture & dev test checkout
-│   │   ├── tags/          # Budget tag categories & limits
+│   │   ├── orders/        # PayPal Orders v2 capture & verification
+│   │   ├── tags/          # Category spending tags & threshold limits
 │   │   └── webhooks/      # Asynchronous PayPal event listeners
-│   ├── globals.css        # Styles, layout, animations & confetti keyframes
-│   ├── layout.tsx         # Root app layout & PayPal Script Provider
-│   └── page.tsx           # Comprehensive Orbit Treasury & Finance Dashboard
+│   ├── globals.css        # Enterprise styling, motion keyframes & status badges
+│   ├── layout.tsx         # Root layout with PayPal SDK context provider
+│   └── page.tsx           # Global Treasury & Financial Operations Console
 ├── lib/
 │   ├── audit.ts           # Append-only immutable audit trail logger
-│   ├── llm.ts             # Multi-model LLM abstraction (Gemini / OpenAI)
-│   ├── paypal.ts          # Core PayPal REST API client (OAuth, Orders, Payouts, Invoices)
-│   └── prisma.ts          # Singleton Prisma database client
+│   ├── llm.ts             # Multi-provider LLM abstraction layer
+│   ├── paypal.ts          # Core PayPal REST API client (Orders, Payouts, Invoicing)
+│   └── prisma.ts          # Singleton Prisma PostgreSQL client
 ├── prisma/
-│   ├── schema.prisma      # Prisma schema (Club, Movement, Tag, Claim, AuditLog)
-│   └── seed.ts            # Seed script for initial clubs & budget tags
-├── .env.example           # Sanitized template for environment configuration
-└── README.md              # Project documentation & architecture overview
+│   ├── schema.prisma      # Schema definition (Club, Movement, Tag, Claim, AuditLog)
+│   └── seed.ts            # Enterprise seed data script
+├── .env.example           # Sanitized environment template
+└── README.md              # Project documentation & architectural specification
 ```
 
 ---
 
-## 📜 License & Compliance
+## 📜 License
 
-Distributed under the **MIT License**. See `LICENSE` for more information.  
-All brand names, trademarks, and logos belong to their respective owners. This project is created for hackathon demonstration and experimental software development only.
+Distributed under the **MIT License**. See `LICENSE` for details.  
+Built for the **PayPal AI Global Hackathon**.
