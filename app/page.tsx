@@ -593,6 +593,73 @@ export default function OrbitApp() {
     setPaymentSuccessData(data);
   };
 
+  // Global Multi-Currency Support (USD, EUR, GBP)
+  type SupportedCurrency = "USD" | "EUR" | "GBP";
+  const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>("USD");
+
+  const currencyRates: Record<SupportedCurrency, { symbol: string; rate: number; label: string }> = {
+    USD: { symbol: "$", rate: 1.0, label: "USD ($)" },
+    EUR: { symbol: "€", rate: 0.92, label: "EUR (€)" },
+    GBP: { symbol: "£", rate: 0.79, label: "GBP (£)" },
+  };
+
+  const formatCurrency = (amountInUsd: number | string | undefined | null) => {
+    const num = typeof amountInUsd === "string" ? parseFloat(amountInUsd) || 0 : (amountInUsd ?? 0);
+    const config = currencyRates[selectedCurrency] || currencyRates.USD;
+    const converted = num * config.rate;
+    return `${config.symbol}${converted.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+
+  // Digital Receipt Modal State
+  const [viewingReceiptMovement, setViewingReceiptMovement] = useState<Movement | null>(null);
+
+  // One-Click Export Ledger to CSV
+  const exportLedgerToCsv = () => {
+    if (movements.length === 0) {
+      setActionNotice({ text: "No movements to export.", type: "info" });
+      return;
+    }
+    const headers = [
+      "Transaction ID",
+      "Date (UTC)",
+      "Type",
+      "Direction",
+      "Counterparty",
+      "Amount",
+      "Currency",
+      "Category Tag",
+      "Status",
+      "PayPal Ref ID",
+      "Notes",
+      "Organization / Entity"
+    ];
+    const rows = movements.map((m) => [
+      `"${m.id}"`,
+      `"${new Date(m.createdAt).toISOString()}"`,
+      `"${m.type}"`,
+      `"${m.direction}"`,
+      `"${(m.counterparty || "").replace(/"/g, '""')}"`,
+      m.amount.toFixed(2),
+      `"${m.currency || selectedCurrency}"`,
+      `"${(m.tag?.name || "").replace(/"/g, '""')}"`,
+      `"${m.status}"`,
+      `"${m.paypalRefId || ""}"`,
+      `"${(m.note || "").replace(/"/g, '""')}"`,
+      `"${(m.club?.name || "").replace(/"/g, '""')}"`
+    ]);
+
+    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `orbit-ledger-export-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    setActionNotice({ text: "📥 Ledger exported successfully as CSV!", type: "success" });
+  };
+
   // Auto-fetch recipient summary for Send screen / modal
   useEffect(() => {
     if (!sendEmail || !sendEmail.includes("@")) {
@@ -1756,6 +1823,34 @@ export default function OrbitApp() {
             </span>
           </button>
 
+          {/* Global Currency Switcher Capsule */}
+          <div
+            className="role-switcher-capsule"
+            style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)" }}
+            title="Switch Global Display Currency"
+          >
+            {(["USD", "EUR", "GBP"] as SupportedCurrency[]).map((cur) => (
+              <button
+                key={cur}
+                type="button"
+                className={`role-switch-btn ${selectedCurrency === cur ? "active" : ""}`}
+                style={{
+                  background: selectedCurrency === cur ? "#0070ba" : "transparent",
+                  color: selectedCurrency === cur ? "#ffffff" : "rgba(255,255,255,0.8)",
+                  fontSize: "0.78rem",
+                  padding: "0.25rem 0.6rem",
+                  fontWeight: 800,
+                }}
+                onClick={() => {
+                  setSelectedCurrency(cur);
+                  setActionNotice({ text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`, type: "info" });
+                }}
+              >
+                {cur === "USD" ? "$ USD" : cur === "EUR" ? "€ EUR" : "£ GBP"}
+              </button>
+            ))}
+          </div>
+
           {/* Demo Role Switcher Capsule */}
           <div className="role-switcher-capsule" title="Toggle Demo User Role">
             <button
@@ -1948,6 +2043,7 @@ export default function OrbitApp() {
                       Try asking:
                     </span>
                     {[
+                      { label: "🔮 Predict Burn-Rate & Overspends", query: "analyze this month's burn rate and predict budget overspends" },
                       { label: "📊 Consolidate Jordan", query: "consolidate payments for jordan@roboticsclub.org" },
                       { label: "🏢 Consolidate Robotics Club", query: "consolidate payments for Robotics Club" },
                       { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
@@ -2854,13 +2950,35 @@ export default function OrbitApp() {
                         Click any contact or payment to view consolidated stats
                       </p>
                     </div>
-                    <button
-                      type="button"
-                      className="section-card-action-link"
-                      onClick={() => setActiveTab("activity")}
-                    >
-                      View all ➔
-                    </button>
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                      <button
+                        type="button"
+                        onClick={exportLedgerToCsv}
+                        style={{
+                          background: "#f0fdf4",
+                          border: "1px solid #bbf7d0",
+                          color: "#166534",
+                          fontSize: "0.76rem",
+                          fontWeight: 700,
+                          padding: "0.25rem 0.65rem",
+                          borderRadius: "9999px",
+                          cursor: "pointer",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "0.25rem",
+                        }}
+                        title="Download CSV export"
+                      >
+                        📥 Export CSV
+                      </button>
+                      <button
+                        type="button"
+                        className="section-card-action-link"
+                        onClick={() => setActiveTab("activity")}
+                      >
+                        View all ➔
+                      </button>
+                    </div>
                   </div>
 
                   {/* Sub-tabs: Recent Movements vs Top Contacts */}
@@ -2938,11 +3056,33 @@ export default function OrbitApp() {
                                   m.direction === "OUTGOING" ? "outgoing" : "incoming"
                                 }`}
                               >
-                                {m.direction === "OUTGOING" ? "-" : "+"} ${m.amount.toFixed(2)}
+                                {m.direction === "OUTGOING" ? "-" : "+"} {formatCurrency(m.amount)}
                               </span>
-                              <span className={`status-badge-mini ${m.status.toLowerCase()}`}>
-                                {m.status}
-                              </span>
+                              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+                                <span className={`status-badge-mini ${m.status.toLowerCase()}`}>
+                                  {m.status}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setViewingReceiptMovement(m);
+                                  }}
+                                  title="View Official Digital Receipt"
+                                  style={{
+                                    background: "#eff6ff",
+                                    border: "1px solid #bfdbfe",
+                                    color: "#1d4ed8",
+                                    borderRadius: "9999px",
+                                    padding: "0.15rem 0.45rem",
+                                    fontSize: "0.68rem",
+                                    fontWeight: 700,
+                                    cursor: "pointer",
+                                  }}
+                                >
+                                  Receipt
+                                </button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -4248,18 +4388,29 @@ export default function OrbitApp() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                className="btn-navy-pill"
-                style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
-                onClick={() => {
-                  fetchMovements();
-                  fetchTags();
-                  fetchClubs();
-                }}
-              >
-                ↻ Refresh All
-              </button>
+              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
+                <button
+                  type="button"
+                  className="btn-navy-pill"
+                  style={{ fontSize: "0.85rem", padding: "0.5rem 1rem", background: "#059669", color: "#ffffff" }}
+                  onClick={exportLedgerToCsv}
+                  title="Export all ledger movements as a CSV file"
+                >
+                  📥 Export CSV
+                </button>
+                <button
+                  type="button"
+                  className="btn-navy-pill"
+                  style={{ fontSize: "0.85rem", padding: "0.5rem 1rem" }}
+                  onClick={() => {
+                    fetchMovements();
+                    fetchTags();
+                    fetchClubs();
+                  }}
+                >
+                  ↻ Refresh All
+                </button>
+              </div>
             </div>
 
             {/* Sub-navigation & Search Header */}
@@ -4422,13 +4573,34 @@ export default function OrbitApp() {
                               }`}
                               style={{ fontSize: "1.15rem" }}
                             >
-                              {m.direction === "OUTGOING" ? "-" : "+"} ${m.amount.toFixed(2)}
+                              {m.direction === "OUTGOING" ? "-" : "+"} {formatCurrency(m.amount)}
                             </span>
 
                             <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
                               <span className={`status-badge-mini ${m.status.toLowerCase()}`}>
                                 {m.status}
                               </span>
+
+                              <button
+                                type="button"
+                                onClick={() => setViewingReceiptMovement(m)}
+                                title="View Official PayPal Sandbox Digital Receipt"
+                                style={{
+                                  background: "#eff6ff",
+                                  border: "1px solid #bfdbfe",
+                                  color: "#1d4ed8",
+                                  borderRadius: "9999px",
+                                  padding: "0.2rem 0.55rem",
+                                  fontSize: "0.72rem",
+                                  fontWeight: 700,
+                                  cursor: "pointer",
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: "0.25rem",
+                                }}
+                              >
+                                🧾 Receipt
+                              </button>
 
                               {m.invoiceUrl && (
                                 <a
@@ -6802,6 +6974,154 @@ export default function OrbitApp() {
       )}
 
       {/* ==================================================== */}
+      {/* MODAL: OFFICIAL PAYPAL SANDBOX DIGITAL RECEIPT       */}
+      {/* ==================================================== */}
+      {viewingReceiptMovement && (
+        <div className="modal-overlay" onClick={() => setViewingReceiptMovement(null)}>
+          <div
+            className="modal-sheet"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: "520px", width: "95%", padding: "1.75rem", borderRadius: "16px", background: "#ffffff", boxShadow: "0 20px 40px rgba(0,0,0,0.18)" }}
+          >
+            {/* Header branding */}
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", borderBottom: "1px solid #e2e8f0", paddingBottom: "1rem" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                  <span style={{ fontSize: "1.3rem" }}>💳</span>
+                  <span style={{ fontWeight: 900, fontSize: "1.15rem", color: "#003087", letterSpacing: "-0.02em" }}>
+                    PayPal <span style={{ color: "#0070ba" }}>Orbit</span>
+                  </span>
+                  <span style={{ fontSize: "0.68rem", fontWeight: 800, background: "#e0f2fe", color: "#0369a1", padding: "0.15rem 0.5rem", borderRadius: "9999px" }}>
+                    SANDBOX VERIFIED
+                  </span>
+                </div>
+                <p style={{ fontSize: "0.78rem", color: "#64748b", margin: "0.2rem 0 0" }}>
+                  Official Digital Transaction Receipt & Ledger Certificate
+                </p>
+              </div>
+              <button
+                type="button"
+                className="btn-close-modal"
+                onClick={() => setViewingReceiptMovement(null)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Receipt Summary Hero */}
+            <div style={{ textAlign: "center", padding: "1.25rem 0", background: "#f8fafc", borderRadius: "12px", margin: "1rem 0" }}>
+              <span style={{ fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "#64748b", fontWeight: 700 }}>
+                {viewingReceiptMovement.direction === "OUTGOING" ? "Amount Paid / Disbursed" : "Amount Received"}
+              </span>
+              <div style={{ fontSize: "2rem", fontWeight: 900, color: viewingReceiptMovement.direction === "OUTGOING" ? "#0f172a" : "#059669", marginTop: "0.2rem" }}>
+                {formatCurrency(viewingReceiptMovement.amount)}
+                {selectedCurrency !== "USD" && (
+                  <span style={{ fontSize: "0.85rem", color: "#64748b", fontWeight: 600, display: "block" }}>
+                    (Original: ${viewingReceiptMovement.amount.toFixed(2)} USD)
+                  </span>
+                )}
+              </div>
+              <div style={{ display: "inline-flex", alignItems: "center", gap: "0.35rem", background: "#ecfdf5", border: "1px solid #a7f3d0", padding: "0.25rem 0.75rem", borderRadius: "9999px", marginTop: "0.4rem" }}>
+                <span style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#10b981" }} />
+                <span style={{ fontSize: "0.74rem", fontWeight: 800, color: "#065f46", textTransform: "uppercase" }}>
+                  {viewingReceiptMovement.status}
+                </span>
+              </div>
+            </div>
+
+            {/* Line Item Breakdown */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.82rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "1rem", marginBottom: "1rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b" }}>Transaction Type:</span>
+                <span style={{ fontWeight: 700, color: "#0f172a" }}>
+                  {viewingReceiptMovement.type === "CART_PAYMENT" ? "Commercial E-Commerce Order (Orders v2)" : viewingReceiptMovement.type === "SEND" ? "Direct Peer / Member Payout (Payouts v1)" : "Invoice / Receivables (Invoicing v2)"}
+                </span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b" }}>Counterparty:</span>
+                <span style={{ fontWeight: 700, color: "#0070ba" }}>{viewingReceiptMovement.counterparty}</span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b" }}>PayPal Reference ID:</span>
+                <span style={{ fontWeight: 700, fontFamily: "monospace", color: "#334155" }}>
+                  {viewingReceiptMovement.paypalRefId || viewingReceiptMovement.id}
+                </span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b" }}>Category / Tag:</span>
+                <span style={{ fontWeight: 700, background: "#f1f5f9", padding: "0.1rem 0.4rem", borderRadius: "4px" }}>
+                  {viewingReceiptMovement.tag?.name || "Operations"}
+                </span>
+              </div>
+
+              {viewingReceiptMovement.club && (
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#64748b" }}>Treasury Vault:</span>
+                  <span style={{ fontWeight: 700, color: "#4338ca" }}>{viewingReceiptMovement.club.name}</span>
+                </div>
+              )}
+
+              {viewingReceiptMovement.note && (
+                <div style={{ display: "flex", justifyContent: "space-between" }}>
+                  <span style={{ color: "#64748b" }}>Memo / Purpose:</span>
+                  <span style={{ fontStyle: "italic", color: "#475569" }}>&ldquo;{viewingReceiptMovement.note}&rdquo;</span>
+                </div>
+              )}
+
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <span style={{ color: "#64748b" }}>Timestamp:</span>
+                <span>{new Date(viewingReceiptMovement.createdAt).toLocaleString()}</span>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px dashed #cbd5e1", paddingTop: "0.5rem" }}>
+                <span style={{ color: "#64748b" }}>PayPal Sandbox Processing Fee:</span>
+                <span style={{ color: "#059669", fontWeight: 700 }}>$0.00 USD (Waived)</span>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                type="button"
+                className="btn-navy-pill"
+                onClick={() => window.print()}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  background: "#f8fafc",
+                  color: "#0f172a",
+                  border: "1.5px solid #cbd5e1",
+                  fontSize: "0.85rem",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                }}
+              >
+                🖨️ Print Receipt
+              </button>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => setViewingReceiptMovement(null)}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  fontSize: "0.85rem",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                  color: "#ffffff",
+                }}
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
       {/* MODAL 3: CONTACT PAYMENT PROFILE & CONSOLIDATION     */}
       {/* ==================================================== */}
       {selectedContactForModal && selectedContactData && (
@@ -7030,6 +7350,7 @@ export default function OrbitApp() {
             {/* Quick Suggestion Chips */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
               {[
+                { label: "🔮 Predict Burn-Rate", query: "analyze this month's burn rate and predict budget overspends" },
                 { label: "📊 Consolidate Jordan", query: "consolidate payments for jordan@roboticsclub.org" },
                 { label: "🏢 Consolidate Robotics Club", query: "consolidate payments for Robotics Club" },
                 { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
@@ -7284,15 +7605,57 @@ export default function OrbitApp() {
               </div>
             </div>
 
-            {/* Dismiss / Done Action */}
-            <button
-              type="button"
-              className="pay-success-btn-done"
-              onClick={() => setPaymentSuccessData(null)}
-              autoFocus
-            >
-              Done & Continue
-            </button>
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: "0.75rem", marginTop: "1rem" }}>
+              <button
+                type="button"
+                className="btn-navy-pill"
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  background: "#f1f5f9",
+                  color: "#0f172a",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "0.85rem",
+                  padding: "0.75rem",
+                  borderRadius: "9999px",
+                }}
+                onClick={() => {
+                  const matched = movements.find((m) => m.paypalRefId === paymentSuccessData.refId || m.counterparty === paymentSuccessData.recipient);
+                  if (matched) {
+                    setViewingReceiptMovement(matched);
+                  } else {
+                    setViewingReceiptMovement({
+                      id: `REC-${Date.now().toString().slice(-6)}`,
+                      type: "SEND",
+                      direction: "OUTGOING",
+                      counterparty: paymentSuccessData.recipient || "Authorized Vendor",
+                      amount: typeof paymentSuccessData.amount === "number" ? paymentSuccessData.amount : parseFloat(String(paymentSuccessData.amount) || "0"),
+                      currency: selectedCurrency,
+                      tag: { id: "demo", name: "Operations" },
+                      status: "COMPLETED",
+                      paypalRefId: paymentSuccessData.refId || `PAYID-${Date.now().toString().slice(-8)}`,
+                      invoiceUrl: null,
+                      note: paymentSuccessData.note || "Payment",
+                      club: activeClub ? { id: activeClub.id, name: activeClub.name } : null,
+                      createdAt: new Date().toISOString(),
+                      updatedAt: new Date().toISOString(),
+                    } as any);
+                  }
+                }}
+              >
+                🧾 Digital Receipt
+              </button>
+              <button
+                type="button"
+                className="pay-success-btn-done"
+                style={{ flex: 1, margin: 0 }}
+                onClick={() => setPaymentSuccessData(null)}
+                autoFocus
+              >
+                Done
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -68,8 +68,40 @@ CRITICAL DIRECTIVES:
       const fallbackTools: Array<any> = [];
       let fallbackDraft: DraftActionPayload | null = null;
 
+      // Intent A0: Predictive Burn-Rate & Budget Forecast
+      if (lower.includes("burn") || lower.includes("predict") || lower.includes("forecast") || lower.includes("overspend") || lower.includes("runway")) {
+        const tool = tools.find((t) => t.name === "predict_burn_rate_and_budget");
+        if (tool) {
+          const res = await tool.execute({});
+          fallbackTools.push({ tool: "predict_burn_rate_and_budget", durationMs: 8, args: {}, result: res });
+          fallbackText = `### 📈 Predictive Burn-Rate & Month-End Forecast\n\n`;
+          fallbackText += `**Overall Monthly Status:** ${res.overallStatus === "PROJECTED_DEFICIT" ? "🚨 **Projected Deficit**" : "✅ **On Track / Sustainable**"}\n\n`;
+          fallbackText += `- **Days Elapsed:** ${res.daysElapsed} of ${res.daysInMonth} days (${res.daysRemaining} days remaining)\n`;
+          fallbackText += `- **Overall Daily Burn Rate:** **$${res.overallDailyBurnRate.toFixed(2)}/day**\n`;
+          fallbackText += `- **Total Spent So Far:** **$${res.totalCurrentSpent.toFixed(2)}** of $${res.totalMonthlyBudget.toFixed(2)}\n`;
+          fallbackText += `- **Projected Month-End Spend:** **$${res.projectedMonthEndSpend.toFixed(2)}**\n\n`;
+
+          if (res.atRiskCategories && res.atRiskCategories.length > 0) {
+            fallbackText += `#### ⚠️ Categories Projected to Exceed Limits:\n`;
+            for (const cat of res.atRiskCategories) {
+              fallbackText += `- **${cat.tagName}:** Burn Rate **$${cat.dailyBurnRate.toFixed(2)}/day** ➔ Projected **$${cat.projectedMonthEndSpend.toFixed(2)}** (Limit: $${cat.monthlyLimit.toFixed(2)}). *Projected overspend: +$${cat.projectedOverspend}*\n`;
+            }
+            fallbackText += `\n`;
+          }
+
+          if (res.surplusCategories && res.surplusCategories.length > 0) {
+            fallbackText += `#### 💡 Available Surplus Categories for Reallocation:\n`;
+            for (const s of res.surplusCategories) {
+              fallbackText += `- **${s.tagName}:** Projected surplus **+$${s.surplusAvailable.toFixed(2)}**\n`;
+            }
+            fallbackText += `\n`;
+          }
+          fallbackText += `**Recommendation:** ${res.recommendation}`;
+        }
+      }
+
       // Intent A: Consolidate payments for a person or organization
-      if (lower.includes("consolidat") || lower.includes("payments to") || lower.includes("total paid") || lower.includes("@") || lower.includes("how much have we paid") || lower.includes("recipient")) {
+      else if (lower.includes("consolidat") || lower.includes("payments to") || lower.includes("total paid") || lower.includes("@") || lower.includes("how much have we paid") || lower.includes("recipient")) {
         const emailMatch = query.match(/[\w.-]+@[\w.-]+\.\w+/);
         const nameMatch = query.match(/(?:to|for)\s+([A-Za-z0-9_.-]+(?:\s+[A-Za-z0-9_.-]+)?)/i);
         const target = emailMatch ? emailMatch[0] : (nameMatch ? nameMatch[1].trim() : "");

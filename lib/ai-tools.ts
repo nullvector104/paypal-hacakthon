@@ -924,6 +924,83 @@ function parseNumericAmount(val: any): number {
     },
   };
 
+  // -------------------------------------------------------------
+  // Tool 13: Predictive Burn-Rate & Budget Forecast
+  // -------------------------------------------------------------
+  const predictBurnRateTool: ToolDefinition = {
+    name: "predict_burn_rate_and_budget",
+    description:
+      "Analyzes current month daily burn rate, forecasts month-end spending per category tag, predicts potential budget breaches, and recommends surplus reallocations.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        clubId: { type: "STRING", description: "Optional organization / entity ID" },
+      },
+      required: [],
+    },
+    execute: async (args: { clubId?: string }) => {
+      const targetClubId = args.clubId || session.defaultClubId;
+      const now = new Date();
+      const currentDay = Math.max(1, now.getDate());
+      const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+      const daysRemaining = daysInMonth - currentDay;
+
+      const tagSummaries = await getTagSpendingSummaries(targetClubId);
+
+      const projections = tagSummaries.map((t) => {
+        const dailyBurn = parseFloat((t.spent / currentDay).toFixed(2));
+        const projectedTotal = parseFloat((dailyBurn * daysInMonth).toFixed(2));
+        const projectedOverspend = Math.max(0, parseFloat((projectedTotal - t.monthlyLimit).toFixed(2)));
+        const willBreach = projectedTotal > t.monthlyLimit;
+        const breachDay = willBreach && dailyBurn > 0 ? Math.ceil(t.monthlyLimit / dailyBurn) : null;
+
+        return {
+          tagName: t.name,
+          monthlyLimit: t.monthlyLimit,
+          currentSpent: t.spent,
+          percentageUsed: t.percentageUsed,
+          dailyBurnRate: dailyBurn,
+          projectedMonthEndSpend: projectedTotal,
+          projectedOverspend,
+          willBreach,
+          estimatedBreachDay: breachDay && breachDay <= daysInMonth ? breachDay : null,
+          surplusAvailable: Math.max(0, parseFloat((t.monthlyLimit - projectedTotal).toFixed(2))),
+        };
+      });
+
+      const totalSpent = tagSummaries.reduce((acc, t) => acc + t.spent, 0);
+      const totalBudget = tagSummaries.reduce((acc, t) => acc + t.monthlyLimit, 0);
+      const totalDailyBurn = parseFloat((totalSpent / currentDay).toFixed(2));
+      const projectedMonthEndTotal = parseFloat((totalDailyBurn * daysInMonth).toFixed(2));
+
+      const atRiskCategories = projections.filter((p) => p.willBreach);
+      const surplusCategories = projections.filter((p) => p.surplusAvailable > 20);
+
+      return {
+        month: now.toLocaleString("default", { month: "long", year: "numeric" }),
+        daysElapsed: currentDay,
+        daysRemaining,
+        daysInMonth,
+        totalMonthlyBudget: parseFloat(totalBudget.toFixed(2)),
+        totalCurrentSpent: parseFloat(totalSpent.toFixed(2)),
+        overallDailyBurnRate: totalDailyBurn,
+        projectedMonthEndSpend: projectedMonthEndTotal,
+        overallStatus: projectedMonthEndTotal > totalBudget ? "PROJECTED_DEFICIT" : "HEALTHY",
+        atRiskCategories,
+        surplusCategories,
+        projections,
+        recommendation:
+          atRiskCategories.length > 0
+            ? `⚠️ Forecast Alert: ${atRiskCategories
+                .map((c) => `"${c.tagName}" (projected overspend: $${c.projectedOverspend})`)
+                .join(", ")}. Consider reallocating surplus from ${
+                surplusCategories.map((s) => `"${s.tagName}" (+$${s.surplusAvailable})`).join(", ") || "contingency vault"
+              }.`
+            : "✅ All spending categories are currently within healthy projected month-end limits.",
+      };
+    },
+  };
+
   return [
     getTagSummaryTool,
     getLedgerTool,
@@ -933,6 +1010,7 @@ function parseNumericAmount(val: any): number {
     calculateDuesTool,
     getPendingClaimsTool,
     getAnomalyCandidatesTool,
+    predictBurnRateTool,
     draftSendTool,
     draftRequestTool,
     draftDuesRequestTool,
