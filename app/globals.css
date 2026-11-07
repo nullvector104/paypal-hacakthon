@@ -461,6 +461,46 @@ body {
   box-shadow: 0 6px 16px rgba(0, 48, 135, 0.3);
 }
 
+.btn-primary {
+  background: linear-gradient(135deg, #4338ca 0%, #312e81 100%);
+  color: #ffffff !important;
+  border: none;
+  font-size: 0.95rem;
+  font-weight: 800;
+  padding: 0.8rem 1.4rem;
+  border-radius: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 14px rgba(67, 56, 202, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: inherit;
+}
+
+.btn-primary * {
+  color: #ffffff !important;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(67, 56, 202, 0.45);
+  color: #ffffff !important;
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  color: #ffffff !important;
+}
+
 /* QUICK SHORTCUT CIRCLES */
 .shortcuts-row {
   display: flex;

@@ -365,6 +365,7 @@ export default function OrbitApp() {
   const [creatingSplit, setCreatingSplit] = useState<boolean>(false);
   const [splitSuccessMsg, setSplitSuccessMsg] = useState<string | null>(null);
   const [settlingMovementId, setSettlingMovementId] = useState<string | null>(null);
+  const [deletingSplitId, setDeletingSplitId] = useState<string | null>(null);
 
   // Club Dues & Claims State
   const [duesCycles, setDuesCycles] = useState<DuesCycleView[]>([]);
@@ -931,6 +932,35 @@ export default function OrbitApp() {
       alert(err.message || "Settling failed.");
     } finally {
       setSettlingMovementId(null);
+    }
+  };
+
+  // Delete Split Bill Expense Record
+  const handleDeleteSplit = async (splitId: string, title: string) => {
+    if (!window.confirm(`Are you sure you want to delete the split expense "${title}"? This will cancel any pending split requests.`)) {
+      return;
+    }
+    setDeletingSplitId(splitId);
+    try {
+      const res = await fetch(`/api/splits/${splitId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to delete split bill.");
+      }
+      setActionNotice({
+        text: `🗑️ ${data.message || "Split bill deleted successfully."}`,
+        type: "success",
+      });
+      fetchSplits();
+      fetchMovements();
+      refreshActiveClubData();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete split bill";
+      setActionNotice({ text: msg, type: "error" });
+    } finally {
+      setDeletingSplitId(null);
     }
   };
 
@@ -3878,7 +3908,10 @@ export default function OrbitApp() {
                       justifyContent: "center",
                       fontWeight: 800,
                       background: "linear-gradient(135deg, #4338ca 0%, #312e81 100%)",
-                      padding: "0.75rem",
+                      color: "#ffffff",
+                      padding: "0.85rem",
+                      borderRadius: "12px",
+                      fontSize: "0.95rem",
                     }}
                   >
                     {creatingSplit
@@ -3930,13 +3963,38 @@ export default function OrbitApp() {
                             </div>
                           </div>
 
-                          <div style={{ textAlign: "right" }}>
-                            <div style={{ fontWeight: 800, fontSize: "1rem", color: "#4338ca" }}>
-                              ${s.collected.toFixed(2)} / ${s.totalRequested.toFixed(2)}
+                          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                            <div style={{ textAlign: "right" }}>
+                              <div style={{ fontWeight: 800, fontSize: "1rem", color: "#4338ca" }}>
+                                ${s.collected.toFixed(2)} / ${s.totalRequested.toFixed(2)}
+                              </div>
+                              <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
+                                {s.progressPercent}% collected
+                              </div>
                             </div>
-                            <div style={{ fontSize: "0.75rem", color: "#64748b" }}>
-                              {s.progressPercent}% collected
-                            </div>
+                            <button
+                              type="button"
+                              disabled={deletingSplitId === s.id}
+                              onClick={() => handleDeleteSplit(s.id, s.title)}
+                              title="Delete this split bill record"
+                              style={{
+                                background: "#fef2f2",
+                                color: "#b91c1c",
+                                border: "1.5px solid #fecaca",
+                                borderRadius: "8px",
+                                padding: "0.35rem 0.65rem",
+                                fontSize: "0.76rem",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: "0.3rem",
+                                transition: "all 0.15s ease",
+                              }}
+                            >
+                              <span>🗑️</span>
+                              <span>{deletingSplitId === s.id ? "Deleting..." : "Delete"}</span>
+                            </button>
                           </div>
                         </div>
 
@@ -5488,6 +5546,8 @@ export default function OrbitApp() {
                                   fontWeight: 800,
                                   fontSize: "0.95rem",
                                   background: "linear-gradient(135deg, #4338ca 0%, #3730a3 100%)",
+                                  color: "#ffffff",
+                                  borderRadius: "12px",
                                   display: "flex",
                                   alignItems: "center",
                                   justifyContent: "center",
@@ -5624,7 +5684,14 @@ export default function OrbitApp() {
                         type="submit"
                         disabled={creatingEvent}
                         className="btn-primary"
-                        style={{ height: "42px", padding: "0 1.25rem", whiteSpace: "nowrap" }}
+                        style={{
+                          height: "44px",
+                          padding: "0 1.35rem",
+                          whiteSpace: "nowrap",
+                          color: "#ffffff",
+                          borderRadius: "12px",
+                          fontWeight: 800,
+                        }}
                       >
                         {creatingEvent ? "Launching..." : "🚀 Launch Campaign"}
                       </button>
