@@ -613,6 +613,12 @@ export default function OrbitApp() {
   // Digital Receipt Modal State
   const [viewingReceiptMovement, setViewingReceiptMovement] = useState<Movement | null>(null);
 
+  // Profile & Personal Pay QR Modal State
+  const [showProfileQrModal, setShowProfileQrModal] = useState<boolean>(false);
+  const [qrAmount, setQrAmount] = useState<string>("");
+  const [qrNote, setQrNote] = useState<string>("Payment to " + currentSessionName);
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
+
   // One-Click Export Ledger to CSV
   const exportLedgerToCsv = () => {
     if (movements.length === 0) {
@@ -1868,15 +1874,23 @@ export default function OrbitApp() {
             </button>
           </div>
 
-          {/* Log Out */}
+          {/* Profile & Pay QR Button */}
           <button
             type="button"
-            className="logout-text-btn"
-            onClick={() => {
-              setActionNotice({ text: "Simulated sandbox session logout.", type: "info" });
-            }}
+            className="profile-nav-btn"
+            onClick={() => setShowProfileQrModal(true)}
+            title="My Profile & Scan-to-Pay QR Code"
           >
-            LOG OUT
+            <div className="profile-nav-avatar">
+              {role === "TREASURER" ? "AR" : "JL"}
+            </div>
+            <div className="profile-nav-info">
+              <span className="profile-nav-name">{role === "TREASURER" ? "Alex R." : "Jordan L."}</span>
+              <span className="profile-nav-role">{role}</span>
+            </div>
+            <span className="profile-nav-qr-icon" title="View Payment QR Code">
+              📷
+            </span>
           </button>
         </div>
       </nav>
@@ -7103,6 +7117,195 @@ export default function OrbitApp() {
                 }}
               >
                 Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: PROFILE & PAY-ME QR CODE MODAL                */}
+      {/* ==================================================== */}
+      {showProfileQrModal && (
+        <div className="receipt-modal-overlay" onClick={() => setShowProfileQrModal(false)}>
+          <div className="receipt-card" style={{ maxWidth: "460px" }} onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div className="receipt-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
+                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.2rem",
+                    fontWeight: 900,
+                    boxShadow: "0 4px 12px rgba(0, 48, 135, 0.3)",
+                  }}
+                >
+                  {role === "TREASURER" ? "AR" : "JL"}
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#0f172a" }}>
+                    {currentSessionName}
+                  </h3>
+                  <p style={{ margin: "0.15rem 0 0", fontSize: "0.82rem", color: "#64748b" }}>
+                    {currentSessionEmail} • <span style={{ fontWeight: 700, color: "#0070ba" }}>PayPal Orbit Profile</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-close-modal"
+                onClick={() => setShowProfileQrModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* QR Card Container */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
+                borderRadius: "16px",
+                padding: "1.5rem 1.25rem",
+                color: "#ffffff",
+                textAlign: "center",
+                margin: "1.25rem 0 1rem",
+                boxShadow: "0 8px 24px rgba(0, 48, 135, 0.25)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: "0.4rem", marginBottom: "0.85rem" }}>
+                <span style={{ fontSize: "0.95rem" }}>💳</span>
+                <span style={{ fontWeight: 800, fontSize: "0.85rem", letterSpacing: "0.04em", textTransform: "uppercase" }}>
+                  Scan to Pay with PayPal
+                </span>
+              </div>
+
+              {/* QR Image Box */}
+              <div
+                style={{
+                  background: "#ffffff",
+                  padding: "1rem",
+                  borderRadius: "14px",
+                  display: "inline-block",
+                  boxShadow: "0 6px 18px rgba(0, 0, 0, 0.15)",
+                }}
+              >
+                <img
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=6&data=${encodeURIComponent(
+                    typeof window !== "undefined"
+                      ? `${window.location.origin}/?tab=send-request&recipient=${encodeURIComponent(currentSessionEmail)}${
+                          qrAmount ? `&amount=${encodeURIComponent(qrAmount)}` : ""
+                        }${qrNote ? `&note=${encodeURIComponent(qrNote)}` : ""}`
+                      : `https://paypal.me/${currentSessionEmail.split("@")[0]}`
+                  )}`}
+                  alt="PayPal Pay-Me QR Code"
+                  style={{ width: "175px", height: "175px", display: "block" }}
+                />
+              </div>
+
+              <div style={{ marginTop: "1rem" }}>
+                <span style={{ fontSize: "0.8rem", opacity: 0.9 }}>
+                  Anyone can scan this QR code with their phone camera to instantly send funds into your account.
+                </span>
+              </div>
+            </div>
+
+            {/* Custom Amount / Note Inputs */}
+            <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem", marginBottom: "1.25rem" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1.6fr", gap: "0.65rem" }}>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.25rem" }}>
+                    Requested Amount ({currencyRates[selectedCurrency]?.symbol || "$"}):
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="1"
+                    placeholder="Any (open)"
+                    value={qrAmount}
+                    onChange={(e) => setQrAmount(e.target.value)}
+                    className="form-input-text"
+                    style={{ padding: "0.5rem 0.65rem", fontSize: "0.85rem" }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: "block", fontSize: "0.75rem", fontWeight: 700, color: "#475569", marginBottom: "0.25rem" }}>
+                    Purpose / Tag Note:
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g. Lunch split or team dues"
+                    value={qrNote}
+                    onChange={(e) => setQrNote(e.target.value)}
+                    className="form-input-text"
+                    style={{ padding: "0.5rem 0.65rem", fontSize: "0.85rem" }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                type="button"
+                onClick={() => {
+                  const payUrl =
+                    typeof window !== "undefined"
+                      ? `${window.location.origin}/?tab=send-request&recipient=${encodeURIComponent(currentSessionEmail)}${
+                          qrAmount ? `&amount=${encodeURIComponent(qrAmount)}` : ""
+                        }${qrNote ? `&note=${encodeURIComponent(qrNote)}` : ""}`
+                      : "";
+                  if (payUrl && navigator.clipboard) {
+                    navigator.clipboard.writeText(payUrl);
+                    setCopiedLink(true);
+                    setTimeout(() => setCopiedLink(false), 2500);
+                  }
+                  setActionNotice({
+                    text: `📋 Copied direct payment link for ${currentSessionEmail}!`,
+                    type: "success",
+                  });
+                }}
+                className="btn-navy-pill"
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  background: copiedLink ? "#ecfdf5" : "#ffffff",
+                  color: copiedLink ? "#065f46" : "#003087",
+                  border: copiedLink ? "1.5px solid #10b981" : "1.5px solid #003087",
+                  fontSize: "0.85rem",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                }}
+              >
+                {copiedLink ? "✓ Link Copied!" : "🔗 Copy Direct Link"}
+              </button>
+
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => {
+                  setShowProfileQrModal(false);
+                  setSendEmail(currentSessionEmail);
+                  if (qrAmount) setSendAmount(qrAmount);
+                  if (qrNote) setSendNote(qrNote);
+                  setShowSendModal(true);
+                }}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  fontSize: "0.85rem",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                  color: "#ffffff",
+                }}
+              >
+                💸 Test Pay Self
               </button>
             </div>
           </div>
