@@ -1755,7 +1755,7 @@ export default function OrbitApp() {
                   className={`nav-link-btn ${activeTab === "send-request" ? "active" : ""}`}
                   onClick={() => setActiveTab("send-request")}
                 >
-                  Send and Request
+                  Send & Request
                 </button>
               </li>
               <li>
@@ -1802,55 +1802,15 @@ export default function OrbitApp() {
                     }
                   }}
                 >
-                  Organizations & Treasury
-                  <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Treasury</span>
+                  Treasury
+                  <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Vault</span>
                 </button>
               </li>
             </ul>
-
-            {/* Role Switcher Pill (Desktop) */}
-            <div className="role-switcher-capsule desktop-only" style={{ padding: "0.15rem 0.25rem" }} title="Toggle Demo User Role">
-              <button
-                type="button"
-                className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
-                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
-                onClick={() => setRole("TREASURER")}
-              >
-                Treasurer
-              </button>
-              <button
-                type="button"
-                className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
-                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
-                onClick={() => setRole("MEMBER")}
-              >
-                Member
-              </button>
-            </div>
           </div>
 
           <div className="top-nav-right">
-            {/* Role Switcher Pill (Mobile) */}
-            <div className="role-switcher-capsule mobile-only" style={{ padding: "0.1rem 0.2rem" }} title="Toggle Demo User Role">
-              <button
-                type="button"
-                className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
-                style={{ padding: "0.18rem 0.45rem", fontSize: "0.68rem" }}
-                onClick={() => setRole("TREASURER")}
-              >
-                Treas
-              </button>
-              <button
-                type="button"
-                className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
-                style={{ padding: "0.18rem 0.45rem", fontSize: "0.68rem" }}
-                onClick={() => setRole("MEMBER")}
-              >
-                Mem
-              </button>
-            </div>
-
-            {/* Quick Tools: Copilot & Currency */}
+            {/* Quick Tools: Copilot, Currency & Role Dropdown */}
             <div className="top-nav-tools-group" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
               {/* Orbit Copilot Toggle Pill */}
               <button
@@ -1861,20 +1821,20 @@ export default function OrbitApp() {
                   background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
                   color: "#ffffff",
                   border: "1px solid rgba(255, 255, 255, 0.35)",
-                  padding: "0.32rem 0.75rem",
+                  padding: "0.26rem 0.65rem",
                   borderRadius: "9999px",
-                  fontSize: "0.8rem",
+                  fontSize: "0.76rem",
                   fontWeight: 800,
                   cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  gap: "0.35rem",
+                  gap: "0.3rem",
                   boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
                   transition: "all 0.2s ease",
                 }}
                 title="Toggle Orbit AI Copilot"
               >
-                <span style={{ fontSize: "0.78rem" }}>✨</span>
+                <span style={{ fontSize: "0.74rem" }}>✨</span>
                 <span className="copilot-label-text">Copilot</span>
               </button>
 
@@ -1895,8 +1855,8 @@ export default function OrbitApp() {
                     color: "#ffffff",
                     border: "1px solid rgba(255, 255, 255, 0.3)",
                     borderRadius: "9999px",
-                    padding: "0.28rem 0.55rem",
-                    fontSize: "0.75rem",
+                    padding: "0.24rem 0.5rem",
+                    fontSize: "0.74rem",
                     fontWeight: 800,
                     cursor: "pointer",
                     outline: "none",
@@ -1915,9 +1875,44 @@ export default function OrbitApp() {
                   </option>
                 </select>
               </div>
+
+              {/* Compact Role Dropdown (converted from button capsule) */}
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <select
+                  value={role}
+                  onChange={(e) => {
+                    const newRole = e.target.value as "TREASURER" | "MEMBER";
+                    setRole(newRole);
+                    setActionNotice({
+                      text: `👤 Switched demo role to ${newRole === "TREASURER" ? "Treasurer (Finance Controller)" : "Team Member"}`,
+                      type: "info",
+                    });
+                  }}
+                  style={{
+                    background: role === "TREASURER" ? "rgba(16, 185, 129, 0.25)" : "rgba(2, 132, 199, 0.25)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(255, 255, 255, 0.35)",
+                    borderRadius: "9999px",
+                    padding: "0.24rem 0.5rem",
+                    fontSize: "0.74rem",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    outline: "none",
+                    backdropFilter: "blur(4px)",
+                  }}
+                  title="Toggle Demo User Role"
+                >
+                  <option value="TREASURER" style={{ color: "#0f172a", background: "#ffffff" }}>
+                    👑 Treasurer
+                  </option>
+                  <option value="MEMBER" style={{ color: "#0f172a", background: "#ffffff" }}>
+                    👤 Member
+                  </option>
+                </select>
+              </div>
             </div>
 
-            {/* Profile & Account Button in Top Right */}
+            {/* Compact Profile & Account Button in Top Right */}
             <button
               type="button"
               className={`profile-nav-btn ${activeTab === "profile" ? "active" : ""}`}
@@ -1927,10 +1922,10 @@ export default function OrbitApp() {
                 background: activeTab === "profile" ? "#ffffff" : "rgba(255, 255, 255, 0.15)",
                 border: activeTab === "profile" ? "1.5px solid #ffffff" : "1px solid rgba(255, 255, 255, 0.3)",
                 borderRadius: "9999px",
-                padding: "0.22rem 0.55rem 0.22rem 0.3rem",
+                padding: "0.16rem 0.45rem 0.16rem 0.2rem",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.35rem",
+                gap: "0.3rem",
                 cursor: "pointer",
                 color: activeTab === "profile" ? "#003087" : "#ffffff",
                 boxShadow: activeTab === "profile" ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
@@ -1939,14 +1934,14 @@ export default function OrbitApp() {
             >
               <div
                 style={{
-                  width: "28px",
-                  height: "28px",
+                  width: "22px",
+                  height: "22px",
                   borderRadius: "50%",
                   background: activeTab === "profile" ? "#003087" : "linear-gradient(135deg, #0070ba 0%, #003087 100%)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  fontSize: "0.74rem",
+                  fontSize: "0.64rem",
                   fontWeight: 900,
                   color: "#ffffff",
                   border: "1px solid rgba(255, 255, 255, 0.6)",
@@ -1955,12 +1950,9 @@ export default function OrbitApp() {
               >
                 {role === "TREASURER" ? "AR" : "JL"}
               </div>
-              <div className="profile-nav-text-block desktop-only" style={{ textAlign: "left", lineHeight: 1.15 }}>
-                <span style={{ fontSize: "0.76rem", fontWeight: 800, display: "block", color: activeTab === "profile" ? "#003087" : "#ffffff" }}>
+              <div className="profile-nav-text-block desktop-only" style={{ textAlign: "left", lineHeight: 1.1 }}>
+                <span style={{ fontSize: "0.72rem", fontWeight: 800, display: "block", color: activeTab === "profile" ? "#003087" : "#ffffff" }}>
                   {role === "TREASURER" ? "Alex R." : "Jordan L."}
-                </span>
-                <span style={{ fontSize: "0.62rem", opacity: 0.85, textTransform: "uppercase", color: activeTab === "profile" ? "#0070ba" : "rgba(255,255,255,0.75)" }}>
-                  {role}
                 </span>
               </div>
             </button>
@@ -2032,8 +2024,8 @@ export default function OrbitApp() {
                   }
                 }}
               >
-                Organizations & Treasury
-                <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Treasury</span>
+                Treasury
+                <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Vault</span>
               </button>
             </li>
             <li>
