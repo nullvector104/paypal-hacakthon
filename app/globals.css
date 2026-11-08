@@ -53,6 +53,9 @@ body {
   color: var(--text-main);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100vw;
 }
 
 /* TOP ANNOUNCEMENT BANNER */
@@ -105,6 +108,30 @@ body {
   z-index: 100;
   width: 100%;
   box-sizing: border-box;
+}
+
+.top-navbar-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.desktop-only-links {
+  display: flex;
+}
+
+.mobile-subnav-strip {
+  display: none;
+}
+
+.nav-links-list-mobile {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .top-nav-left {
@@ -2178,6 +2205,394 @@ body {
   outline: none;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
 }
+
+/* ==================================================== */
+/* MOBILE RESPONSIVENESS & NATIVE DOCK STYLES           */
+/* ==================================================== */
+
+/* Responsive Stacks for Multi-Column Grids */
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.responsive-btn-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.responsive-three-col-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.split-bill-form-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.5rem;
+}
+
+.contacts-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(280px, 100%), 1fr));
+  gap: 1rem;
+}
+
+.club-overview-main-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1.5rem;
+}
+
+.three-col-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+.event-contribute-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.5rem;
+}
+
+.responsive-two-col-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.event-launch-form-grid {
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 1.5rem;
+}
+
+.club-claims-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 1.5rem;
+}
+
+.profile-header-banner {
+  background: linear-gradient(135deg, #003087 0%, #0070ba 100%);
+  border-radius: 16px;
+  padding: 1.75rem;
+  color: #ffffff;
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  box-shadow: 0 6px 20px rgba(0, 48, 135, 0.25);
+}
+
+/* NATIVE MOBILE BOTTOM NAVIGATION DOCK (Hidden on desktop) */
+.mobile-bottom-dock {
+  display: none;
+}
+
+/* ==================================================== */
+/* COMPREHENSIVE MOBILE VIEWPORT MEDIA QUERIES (<= 768px)*/
+/* ==================================================== */
+@media (max-width: 768px) {
+  /* Prevent iOS zoom on inputs */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
+  /* Main Container Padding adjusted for bottom dock */
+  .app-container {
+    padding: 1rem 0.75rem 6.5rem 0.75rem !important;
+    max-width: 100vw;
+  }
+
+  .top-notice-bar {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.75rem;
+  }
+
+  /* Top Navbar on Mobile */
+  .top-navbar {
+    height: auto !important;
+    padding: 0.55rem 0.75rem 0.35rem 0.75rem !important;
+    flex-direction: column !important;
+    gap: 0.45rem !important;
+  }
+
+  .top-navbar-main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .top-nav-left {
+    gap: 0.45rem;
+    min-width: 0;
+  }
+
+  .brand-logo-text {
+    font-size: 1.25rem !important;
+    margin-right: 0.2rem !important;
+  }
+
+  .desktop-only-links {
+    display: none !important;
+  }
+
+  .top-nav-right {
+    gap: 0.35rem;
+  }
+
+  .copilot-label-text {
+    display: none !important;
+  }
+
+  .copilot-nav-toggle-btn {
+    padding: 0.32rem 0.55rem !important;
+  }
+
+  .profile-nav-text-block {
+    display: none !important;
+  }
+
+  .profile-nav-btn {
+    padding: 0.2rem !important;
+  }
+
+  /* Edge-to-edge Horizontal Subnav Strip */
+  .mobile-subnav-strip {
+    display: block !important;
+    width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.15rem 0 0.25rem 0;
+  }
+
+  .mobile-subnav-strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .nav-links-list-mobile {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  .nav-links-list-mobile .nav-link-btn {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.7rem;
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-links-list-mobile .nav-link-btn.active {
+    background: #ffffff;
+    color: var(--nav-bg);
+  }
+
+  /* NATIVE MOBILE BOTTOM NAVIGATION DOCK */
+  .mobile-bottom-dock {
+    display: flex !important;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 9999 !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    padding: 0.4rem 0 max(0.5rem, env(safe-area-inset-bottom)) 0;
+    justify-content: space-around;
+    align-items: center;
+  }
+
+  .mobile-dock-btn {
+    background: transparent;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.15rem;
+    flex: 1;
+    padding: 0.3rem 0;
+    cursor: pointer;
+    color: #64748b;
+    position: relative;
+    transition: all 0.15s ease;
+  }
+
+  .mobile-dock-btn.active {
+    color: #003087;
+  }
+
+  .mobile-dock-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: transform 0.15s ease;
+  }
+
+  .mobile-dock-btn.active .mobile-dock-icon {
+    transform: scale(1.15);
+  }
+
+  .mobile-dock-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  .mobile-dock-dot {
+    position: absolute;
+    bottom: 0.08rem;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #003087;
+  }
+
+  .mobile-dock-badge {
+    position: absolute;
+    top: -4px;
+    right: -8px;
+    background: #ef4444;
+    color: #ffffff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    padding: 0.1rem 0.35rem;
+    border-radius: 9999px;
+    line-height: 1;
+  }
+
+  /* Card padding on mobile */
+  .section-card {
+    padding: 1.15rem 1rem !important;
+    border-radius: 14px !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  /* Grid collapses to 1fr on mobile */
+  .profile-grid,
+  .responsive-btn-grid-2,
+  .responsive-three-col-cards,
+  .split-bill-form-grid,
+  .club-overview-main-grid,
+  .three-col-stats-grid,
+  .event-contribute-grid,
+  .responsive-two-col-inputs,
+  .event-launch-form-grid,
+  .club-claims-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .profile-header-banner {
+    padding: 1.25rem 1rem !important;
+  }
+
+  /* AI Command Bar on Mobile */
+  .ai-command-container {
+    padding: 1.1rem 0.85rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .ai-chips-row {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 0.35rem;
+  }
+
+  .ai-chips-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Floating Copilot Trigger cleared above bottom dock */
+  .copilot-dock-trigger {
+    bottom: 74px !important;
+    right: 14px !important;
+  }
+
+  .copilot-dock-trigger.dock-left {
+    left: 14px !important;
+    right: auto !important;
+  }
+
+  /* Copilot Floating Panel as full-screen sheet on mobile */
+  .copilot-floating-panel {
+    top: 0 !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-radius: 0 !important;
+    z-index: 20000 !important;
+  }
+
+  /* Modals on Mobile */
+  .modal-overlay {
+    padding: 0.5rem !important;
+    align-items: flex-end !important;
+  }
+
+  .modal-sheet {
+    padding: 1.35rem 1.1rem !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  .contact-modal-overlay {
+    padding: 0.5rem !important;
+    align-items: flex-end !important;
+  }
+
+  .contact-modal-content {
+    width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+  }
+
+  .contact-modal-body {
+    padding: 1rem 0.85rem !important;
+  }
+
+  /* Instamart Product Grid on mobile: 2-column mobile experience */
+  .product-catalog-grid {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  .product-catalog-card {
+    padding: 0.75rem !important;
+  }
+
+  /* Card link banner */
+  .card-link-banner {
+    padding: 0.85rem 1rem !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Club selector scroll */
+  .club-scroll-select {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
 
 
 

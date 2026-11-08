@@ -1725,12 +1725,229 @@ export default function OrbitApp() {
         </div>
       )}
 
-      {/* 2. TOP BLUE NAVIGATION BAR (Exact blueprint match) */}
+      {/* 2. TOP BLUE NAVIGATION BAR */}
       <nav className="top-navbar">
-        <div className="top-nav-left">
-          <span className="brand-logo-text">ORBIT</span>
+        <div className="top-navbar-main">
+          <div className="top-nav-left">
+            <span
+              className="brand-logo-text"
+              onClick={() => setActiveTab("home")}
+              style={{ cursor: "pointer" }}
+            >
+              ORBIT
+            </span>
 
-          <ul className="nav-links-list">
+            {/* Desktop Navigation Links List */}
+            <ul className="nav-links-list desktop-only-links">
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link-btn ${activeTab === "home" ? "active" : ""}`}
+                  onClick={() => setActiveTab("home")}
+                >
+                  Home
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link-btn ${activeTab === "send-request" ? "active" : ""}`}
+                  onClick={() => setActiveTab("send-request")}
+                >
+                  Send and Request
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link-btn ${activeTab === "instamart" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveTab("instamart");
+                    if (products.length === 0) searchProducts("coffee");
+                  }}
+                >
+                  Instamart
+                  <span className="nav-badge-pill">Shop</span>
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link-btn ${activeTab === "payment-methods" ? "active" : ""}`}
+                  onClick={() => setActiveTab("payment-methods")}
+                >
+                  Payment Methods
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link-btn ${activeTab === "activity" ? "active" : ""}`}
+                  onClick={() => setActiveTab("activity")}
+                >
+                  Activity
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link-btn ${activeTab === "club" ? "active" : ""}`}
+                  onClick={() => {
+                    setActiveTab("club");
+                    if (activeClub) {
+                      fetchClubDues(activeClub.id);
+                      fetchClubClaims(activeClub.id);
+                      fetchClubLedger(activeClub.id);
+                    }
+                  }}
+                >
+                  Clubs & Treasury
+                  <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Club</span>
+                </button>
+              </li>
+            </ul>
+
+            {/* Role Switcher Pill */}
+            <div className="role-switcher-capsule" style={{ padding: "0.15rem 0.25rem" }} title="Toggle Demo User Role">
+              <button
+                type="button"
+                className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
+                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
+                onClick={() => setRole("TREASURER")}
+              >
+                Treasurer
+              </button>
+              <button
+                type="button"
+                className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
+                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
+                onClick={() => setRole("MEMBER")}
+              >
+                Member
+              </button>
+            </div>
+          </div>
+
+          <div className="top-nav-right">
+            {/* Quick Tools: Copilot & Currency */}
+            <div className="top-nav-tools-group" style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
+              {/* Orbit Copilot Toggle Pill */}
+              <button
+                type="button"
+                className="copilot-nav-toggle-btn"
+                onClick={() => setCopilotOpen((prev) => !prev)}
+                style={{
+                  background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
+                  color: "#ffffff",
+                  border: "1px solid rgba(255, 255, 255, 0.35)",
+                  padding: "0.32rem 0.75rem",
+                  borderRadius: "9999px",
+                  fontSize: "0.8rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.35rem",
+                  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                  transition: "all 0.2s ease",
+                }}
+                title="Toggle Orbit AI Copilot"
+              >
+                <span style={{ fontSize: "0.78rem" }}>✨</span>
+                <span className="copilot-label-text">Copilot</span>
+              </button>
+
+              {/* Compact Currency Dropdown */}
+              <div style={{ position: "relative", display: "inline-block" }}>
+                <select
+                  value={selectedCurrency}
+                  onChange={(e) => {
+                    const cur = e.target.value as SupportedCurrency;
+                    setSelectedCurrency(cur);
+                    setActionNotice({
+                      text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`,
+                      type: "info",
+                    });
+                  }}
+                  style={{
+                    background: "rgba(0, 0, 0, 0.28)",
+                    color: "#ffffff",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    borderRadius: "9999px",
+                    padding: "0.32rem 0.65rem",
+                    fontSize: "0.78rem",
+                    fontWeight: 800,
+                    cursor: "pointer",
+                    outline: "none",
+                    backdropFilter: "blur(4px)",
+                  }}
+                  title="Select Display Currency"
+                >
+                  <option value="USD" style={{ color: "#0f172a", background: "#ffffff" }}>
+                    $ USD
+                  </option>
+                  <option value="EUR" style={{ color: "#0f172a", background: "#ffffff" }}>
+                    € EUR
+                  </option>
+                  <option value="GBP" style={{ color: "#0f172a", background: "#ffffff" }}>
+                    £ GBP
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            {/* Profile & Account Button in Top Right */}
+            <button
+              type="button"
+              className={`profile-nav-btn ${activeTab === "profile" ? "active" : ""}`}
+              onClick={() => setActiveTab("profile")}
+              title="My Profile & Scan-to-Pay QR Code"
+              style={{
+                background: activeTab === "profile" ? "#ffffff" : "rgba(255, 255, 255, 0.15)",
+                border: activeTab === "profile" ? "1.5px solid #ffffff" : "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "9999px",
+                padding: "0.22rem 0.75rem 0.22rem 0.3rem",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.45rem",
+                cursor: "pointer",
+                color: activeTab === "profile" ? "#003087" : "#ffffff",
+                boxShadow: activeTab === "profile" ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
+                transition: "all 0.15s ease",
+              }}
+            >
+              <div
+                style={{
+                  width: "28px",
+                  height: "28px",
+                  borderRadius: "50%",
+                  background: activeTab === "profile" ? "#003087" : "linear-gradient(135deg, #0070ba 0%, #003087 100%)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "0.74rem",
+                  fontWeight: 900,
+                  color: "#ffffff",
+                  border: "1px solid rgba(255, 255, 255, 0.6)",
+                }}
+              >
+                {role === "TREASURER" ? "AR" : "JL"}
+              </div>
+              <div className="profile-nav-text-block" style={{ textAlign: "left", lineHeight: 1.15 }}>
+                <span style={{ fontSize: "0.76rem", fontWeight: 800, display: "block", color: activeTab === "profile" ? "#003087" : "#ffffff" }}>
+                  {role === "TREASURER" ? "Alex R." : "Jordan L."}
+                </span>
+                <span style={{ fontSize: "0.62rem", opacity: 0.85, textTransform: "uppercase", color: activeTab === "profile" ? "#0070ba" : "rgba(255,255,255,0.75)" }}>
+                  {role}
+                </span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Horizontal Scrollable Tab Strip (Visible on mobile <= 768px) */}
+        <div className="mobile-subnav-strip">
+          <ul className="nav-links-list-mobile">
             <li>
               <button
                 type="button"
@@ -1746,7 +1963,7 @@ export default function OrbitApp() {
                 className={`nav-link-btn ${activeTab === "send-request" ? "active" : ""}`}
                 onClick={() => setActiveTab("send-request")}
               >
-                Send and Request
+                Send & Request
               </button>
             </li>
             <li>
@@ -1797,143 +2014,17 @@ export default function OrbitApp() {
                 <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Club</span>
               </button>
             </li>
+            <li>
+              <button
+                type="button"
+                className={`nav-link-btn ${activeTab === "profile" ? "active" : ""}`}
+                onClick={() => setActiveTab("profile")}
+              >
+                Profile & QR
+                <span className="nav-badge-pill" style={{ background: "#10b981" }}>QR</span>
+              </button>
+            </li>
           </ul>
-
-          {/* Quick Utility Tools Docked Next to Links */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", marginLeft: "0.5rem" }}>
-            {/* Orbit Copilot Toggle Pill */}
-            <button
-              type="button"
-              className="copilot-nav-toggle-btn"
-              onClick={() => setCopilotOpen((prev) => !prev)}
-              style={{
-                background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
-                color: "#ffffff",
-                border: "1px solid rgba(255, 255, 255, 0.35)",
-                padding: "0.32rem 0.75rem",
-                borderRadius: "9999px",
-                fontSize: "0.8rem",
-                fontWeight: 800,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                gap: "0.35rem",
-                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-                transition: "all 0.2s ease",
-              }}
-              title="Toggle Orbit AI Copilot"
-            >
-              <span style={{ fontSize: "0.78rem" }}>✨</span>
-              <span>Copilot</span>
-            </button>
-
-            {/* Compact Currency Dropdown */}
-            <div style={{ position: "relative", display: "inline-block" }}>
-              <select
-                value={selectedCurrency}
-                onChange={(e) => {
-                  const cur = e.target.value as SupportedCurrency;
-                  setSelectedCurrency(cur);
-                  setActionNotice({
-                    text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`,
-                    type: "info",
-                  });
-                }}
-                style={{
-                  background: "rgba(0, 0, 0, 0.28)",
-                  color: "#ffffff",
-                  border: "1px solid rgba(255, 255, 255, 0.3)",
-                  borderRadius: "9999px",
-                  padding: "0.32rem 0.65rem",
-                  fontSize: "0.78rem",
-                  fontWeight: 800,
-                  cursor: "pointer",
-                  outline: "none",
-                  backdropFilter: "blur(4px)",
-                }}
-                title="Select Display Currency"
-              >
-                <option value="USD" style={{ color: "#0f172a", background: "#ffffff" }}>
-                  $ USD
-                </option>
-                <option value="EUR" style={{ color: "#0f172a", background: "#ffffff" }}>
-                  € EUR
-                </option>
-                <option value="GBP" style={{ color: "#0f172a", background: "#ffffff" }}>
-                  £ GBP
-                </option>
-              </select>
-            </div>
-
-            {/* Demo Role Switcher Capsule */}
-            <div className="role-switcher-capsule" style={{ padding: "0.15rem 0.25rem" }} title="Toggle Demo User Role">
-              <button
-                type="button"
-                className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
-                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
-                onClick={() => setRole("TREASURER")}
-              >
-                Treasurer
-              </button>
-              <button
-                type="button"
-                className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
-                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
-                onClick={() => setRole("MEMBER")}
-              >
-                Member
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="top-nav-right">
-          {/* Profile & Account Button in Top Right */}
-          <button
-            type="button"
-            className={`profile-nav-btn ${activeTab === "profile" ? "active" : ""}`}
-            onClick={() => setActiveTab("profile")}
-            title="My Profile & Scan-to-Pay QR Code"
-            style={{
-              background: activeTab === "profile" ? "#ffffff" : "rgba(255, 255, 255, 0.15)",
-              border: activeTab === "profile" ? "1.5px solid #ffffff" : "1px solid rgba(255, 255, 255, 0.3)",
-              borderRadius: "9999px",
-              padding: "0.22rem 0.75rem 0.22rem 0.3rem",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.45rem",
-              cursor: "pointer",
-              color: activeTab === "profile" ? "#003087" : "#ffffff",
-              boxShadow: activeTab === "profile" ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
-              transition: "all 0.15s ease",
-            }}
-          >
-            <div
-              style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "50%",
-                background: activeTab === "profile" ? "#003087" : "linear-gradient(135deg, #0070ba 0%, #003087 100%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "0.74rem",
-                fontWeight: 900,
-                color: "#ffffff",
-                border: "1px solid rgba(255, 255, 255, 0.6)",
-              }}
-            >
-              {role === "TREASURER" ? "AR" : "JL"}
-            </div>
-            <div style={{ textAlign: "left", lineHeight: 1.15 }}>
-              <span style={{ fontSize: "0.76rem", fontWeight: 800, display: "block", color: activeTab === "profile" ? "#003087" : "#ffffff" }}>
-                {role === "TREASURER" ? "Alex R." : "Jordan L."}
-              </span>
-              <span style={{ fontSize: "0.62rem", opacity: 0.85, textTransform: "uppercase", color: activeTab === "profile" ? "#0070ba" : "rgba(255,255,255,0.75)" }}>
-                {role}
-              </span>
-            </div>
-          </button>
         </div>
       </nav>
 
@@ -2505,7 +2596,7 @@ export default function OrbitApp() {
                     </div>
                   </div>
 
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                  <div className="responsive-btn-grid-2">
                     <button
                       type="button"
                       className="btn-navy-pill"
@@ -3769,7 +3860,7 @@ export default function OrbitApp() {
               </p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1.25rem" }}>
+            <div className="responsive-three-col-cards">
               <div className="section-card">
                 <h3 className="section-card-title" style={{ marginBottom: "0.75rem" }}>
                   Send Money (Payouts)
@@ -3883,7 +3974,7 @@ export default function OrbitApp() {
                 </div>
               )}
 
-              <form onSubmit={handleCreateSplit} style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "1.5rem" }}>
+              <form onSubmit={handleCreateSplit} className="split-bill-form-grid">
                 {/* Form Controls */}
                 <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
                   <div className="form-group-field">
@@ -4718,7 +4809,7 @@ export default function OrbitApp() {
                     );
                   }
                   return (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: "1rem" }}>
+                    <div className="contacts-cards-grid">
                       {filteredContacts.map((c) => (
                         <div
                           key={c.counterparty}
@@ -5026,7 +5117,7 @@ export default function OrbitApp() {
             {/* SUBTAB 1: OVERVIEW                                   */}
             {/* ==================================================== */}
             {clubSubTab === "overview" && (
-              <div style={{ display: "grid", gridTemplateColumns: "1.2fr 0.8fr", gap: "1.5rem" }}>
+              <div className="club-overview-main-grid">
                 <div>
                   {/* Ledger Breakdown Card */}
                   <div className="section-card" style={{ marginBottom: "1.5rem" }}>
@@ -5035,7 +5126,7 @@ export default function OrbitApp() {
                       Authoritatively derived in code from completed unified ledger transactions
                     </p>
 
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "1rem" }}>
+                    <div className="three-col-stats-grid">
                       <div style={{ background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "1rem", borderRadius: "10px" }}>
                         <span style={{ fontSize: "0.72rem", color: "#166534", textTransform: "uppercase", fontWeight: 700 }}>
                           Total Collected
@@ -5640,7 +5731,7 @@ export default function OrbitApp() {
                         </div>
 
                         {/* Two Columns: Contribute Action & Recent Donors */}
-                        <div style={{ display: "grid", gridTemplateColumns: "1.1fr 0.9fr", gap: "1.5rem" }}>
+                        <div className="event-contribute-grid">
                           {/* Left Column: Contribution via PayPal Order */}
                           <div className="section-card">
                             <div className="section-card-header">
@@ -5711,7 +5802,7 @@ export default function OrbitApp() {
                                 />
                               </div>
 
-                              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+                              <div className="responsive-two-col-inputs">
                                 <div className="form-group-field">
                                   <label className="form-field-label">
                                     Your Name / Sponsor
@@ -5855,7 +5946,7 @@ export default function OrbitApp() {
                       </div>
                     </div>
 
-                    <form onSubmit={handleCreateEvent} style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr 0.8fr auto", gap: "1rem", alignItems: "flex-end" }}>
+                    <form onSubmit={handleCreateEvent} className="event-launch-form-grid" style={{ alignItems: "flex-end" }}>
                       <div className="form-group-field">
                         <label className="form-field-label">
                           Campaign Title
@@ -6171,7 +6262,7 @@ export default function OrbitApp() {
             {/* SUBTAB 3: REQUESTS (REIMBURSEMENT CLAIMS)            */}
             {/* ==================================================== */}
             {clubSubTab === "requests" && (
-              <div style={{ display: "grid", gridTemplateColumns: "0.9fr 1.1fr", gap: "1.5rem" }}>
+              <div className="club-claims-grid">
                 {/* Submit Claim Card */}
                 <div className="section-card">
                   <h3 className="section-card-title">Submit a Reimbursement Claim</h3>
@@ -6541,21 +6632,7 @@ export default function OrbitApp() {
         {activeTab === "profile" && (
           <div style={{ maxWidth: "860px", margin: "0 auto" }}>
             {/* Header Banner */}
-            <div
-              style={{
-                background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
-                borderRadius: "16px",
-                padding: "1.75rem",
-                color: "#ffffff",
-                marginBottom: "1.5rem",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "1rem",
-                boxShadow: "0 6px 20px rgba(0, 48, 135, 0.25)",
-              }}
-            >
+            <div className="profile-header-banner">
               <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                 <div
                   style={{
@@ -6626,7 +6703,7 @@ export default function OrbitApp() {
             </div>
 
             {/* Main Profile Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+            <div className="profile-grid">
               {/* Left Column: Live QR Code Card */}
               <div className="section-card" style={{ textAlign: "center", padding: "1.75rem 1.5rem" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
@@ -7244,7 +7321,7 @@ export default function OrbitApp() {
                 />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <div className="responsive-two-col-inputs">
                 <div className="form-group-field">
                   <label className="form-field-label">
                     Financial Officer Name <span style={{ color: "#ef4444" }}>*</span>
@@ -7274,7 +7351,7 @@ export default function OrbitApp() {
                 </div>
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.75rem" }}>
+              <div className="responsive-two-col-inputs">
                 <div className="form-group-field">
                   <label className="form-field-label">
                     Initial Expense Category / Tag <span style={{ color: "#ef4444" }}>*</span>
@@ -8188,6 +8265,79 @@ export default function OrbitApp() {
           </div>
         </div>
       )}
+
+      {/* 4. NATIVE MOBILE BOTTOM NAVIGATION DOCK (Visible on mobile <= 768px) */}
+      <nav className="mobile-bottom-dock" aria-label="Mobile Navigation Dock">
+        <button
+          type="button"
+          className={`mobile-dock-btn ${activeTab === "home" ? "active" : ""}`}
+          onClick={() => setActiveTab("home")}
+          title="Home Dashboard"
+        >
+          <span className="mobile-dock-icon">🏠</span>
+          <span className="mobile-dock-label">Home</span>
+          {activeTab === "home" && <span className="mobile-dock-dot" />}
+        </button>
+
+        <button
+          type="button"
+          className={`mobile-dock-btn ${activeTab === "send-request" ? "active" : ""}`}
+          onClick={() => setActiveTab("send-request")}
+          title="Send and Request Money"
+        >
+          <span className="mobile-dock-icon">💸</span>
+          <span className="mobile-dock-label">Send & Pay</span>
+          {activeTab === "send-request" && <span className="mobile-dock-dot" />}
+        </button>
+
+        <button
+          type="button"
+          className={`mobile-dock-btn ${activeTab === "instamart" ? "active" : ""}`}
+          onClick={() => {
+            setActiveTab("instamart");
+            if (products.length === 0) searchProducts("coffee");
+          }}
+          title="Instamart Store"
+        >
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <span className="mobile-dock-icon">🛍️</span>
+            {cartItems.length > 0 && (
+              <span className="mobile-dock-badge">{cartItems.length}</span>
+            )}
+          </div>
+          <span className="mobile-dock-label">Shop</span>
+          {activeTab === "instamart" && <span className="mobile-dock-dot" />}
+        </button>
+
+        <button
+          type="button"
+          className={`mobile-dock-btn ${activeTab === "club" ? "active" : ""}`}
+          onClick={() => {
+            setActiveTab("club");
+            if (activeClub) {
+              fetchClubDues(activeClub.id);
+              fetchClubClaims(activeClub.id);
+              fetchClubLedger(activeClub.id);
+            }
+          }}
+          title="Clubs & Treasury"
+        >
+          <span className="mobile-dock-icon">🏛️</span>
+          <span className="mobile-dock-label">Treasury</span>
+          {activeTab === "club" && <span className="mobile-dock-dot" />}
+        </button>
+
+        <button
+          type="button"
+          className={`mobile-dock-btn ${activeTab === "profile" ? "active" : ""}`}
+          onClick={() => setActiveTab("profile")}
+          title="Profile & Instant QR"
+        >
+          <span className="mobile-dock-icon">👤</span>
+          <span className="mobile-dock-label">Profile & QR</span>
+          {activeTab === "profile" && <span className="mobile-dock-dot" />}
+        </button>
+      </nav>
     </div>
   );
 }
