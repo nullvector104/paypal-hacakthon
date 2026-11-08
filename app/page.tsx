@@ -332,7 +332,7 @@ function renderFormattedCopilotText(text: string) {
 export default function OrbitApp() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<
-    "home" | "send-request" | "instamart" | "payment-methods" | "activity" | "club" | "profile"
+    "home" | "send-request" | "instamart" | "payment-methods" | "activity" | "club"
   >("home");
 
   // Club Sub-Tab Navigation
@@ -612,12 +612,6 @@ export default function OrbitApp() {
 
   // Digital Receipt Modal State
   const [viewingReceiptMovement, setViewingReceiptMovement] = useState<Movement | null>(null);
-
-  // Profile & Personal Pay QR State
-  const [qrAmount, setQrAmount] = useState<string>("");
-  const [qrNote, setQrNote] = useState<string>("Payment to " + currentSessionName);
-  const [qrSeed, setQrSeed] = useState<number>(Date.now());
-  const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
   // One-Click Export Ledger to CSV
   const exportLedgerToCsv = () => {
@@ -1796,16 +1790,6 @@ export default function OrbitApp() {
                 <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Club</span>
               </button>
             </li>
-            <li>
-              <button
-                type="button"
-                className={`nav-link-btn ${activeTab === "profile" ? "active" : ""}`}
-                onClick={() => setActiveTab("profile")}
-              >
-                Profile & QR
-                <span className="nav-badge-pill" style={{ background: "#059669" }}>Pay</span>
-              </button>
-            </li>
           </ul>
         </div>
 
@@ -1819,57 +1803,67 @@ export default function OrbitApp() {
               background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
               color: "#ffffff",
               border: "1px solid rgba(255, 255, 255, 0.35)",
-              padding: "0.42rem 0.95rem",
+              padding: "0.38rem 0.85rem",
               borderRadius: "9999px",
-              fontSize: "0.84rem",
+              fontSize: "0.82rem",
               fontWeight: 800,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
-              gap: "0.4rem",
-              boxShadow: "0 2px 10px rgba(0, 0, 0, 0.2)",
+              gap: "0.35rem",
+              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
               transition: "all 0.2s ease",
             }}
             title="Toggle Orbit AI Copilot"
           >
-            <span style={{ fontSize: "0.85rem" }}>✨</span>
+            <span style={{ fontSize: "0.8rem" }}>✨</span>
             <span>Copilot</span>
           </button>
 
-          {/* Global Currency Switcher Capsule */}
-          <div
-            className="role-switcher-capsule"
-            style={{ background: "rgba(255, 255, 255, 0.12)", border: "1px solid rgba(255, 255, 255, 0.25)", padding: "0.25rem 0.35rem" }}
-            title="Switch Global Display Currency"
-          >
-            {(["USD", "EUR", "GBP"] as SupportedCurrency[]).map((cur) => (
-              <button
-                key={cur}
-                type="button"
-                className={`role-switch-btn ${selectedCurrency === cur ? "active" : ""}`}
-                style={{
-                  background: selectedCurrency === cur ? "#0070ba" : "transparent",
-                  color: selectedCurrency === cur ? "#ffffff" : "rgba(255,255,255,0.8)",
-                  fontSize: "0.82rem",
-                  padding: "0.32rem 0.75rem",
-                  fontWeight: 800,
-                }}
-                onClick={() => {
-                  setSelectedCurrency(cur);
-                  setActionNotice({ text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`, type: "info" });
-                }}
-              >
-                {cur === "USD" ? "$ USD" : cur === "EUR" ? "€ EUR" : "£ GBP"}
-              </button>
-            ))}
+          {/* Compact Currency Dropdown */}
+          <div style={{ position: "relative", display: "inline-block" }}>
+            <select
+              value={selectedCurrency}
+              onChange={(e) => {
+                const cur = e.target.value as SupportedCurrency;
+                setSelectedCurrency(cur);
+                setActionNotice({
+                  text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`,
+                  type: "info",
+                });
+              }}
+              style={{
+                background: "rgba(0, 0, 0, 0.28)",
+                color: "#ffffff",
+                border: "1px solid rgba(255, 255, 255, 0.3)",
+                borderRadius: "9999px",
+                padding: "0.38rem 0.75rem",
+                fontSize: "0.8rem",
+                fontWeight: 800,
+                cursor: "pointer",
+                outline: "none",
+                backdropFilter: "blur(4px)",
+              }}
+              title="Select Display Currency"
+            >
+              <option value="USD" style={{ color: "#0f172a", background: "#ffffff" }}>
+                $ USD
+              </option>
+              <option value="EUR" style={{ color: "#0f172a", background: "#ffffff" }}>
+                € EUR
+              </option>
+              <option value="GBP" style={{ color: "#0f172a", background: "#ffffff" }}>
+                £ GBP
+              </option>
+            </select>
           </div>
 
           {/* Demo Role Switcher Capsule */}
-          <div className="role-switcher-capsule" style={{ padding: "0.25rem 0.35rem" }} title="Toggle Demo User Role">
+          <div className="role-switcher-capsule" style={{ padding: "0.2rem 0.3rem" }} title="Toggle Demo User Role">
             <button
               type="button"
               className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
-              style={{ padding: "0.32rem 0.85rem", fontSize: "0.82rem" }}
+              style={{ padding: "0.28rem 0.75rem", fontSize: "0.78rem" }}
               onClick={() => setRole("TREASURER")}
             >
               Treasurer
@@ -1877,31 +1871,12 @@ export default function OrbitApp() {
             <button
               type="button"
               className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
-              style={{ padding: "0.32rem 0.85rem", fontSize: "0.82rem" }}
+              style={{ padding: "0.28rem 0.75rem", fontSize: "0.78rem" }}
               onClick={() => setRole("MEMBER")}
             >
               Member
             </button>
           </div>
-
-          {/* Profile & Pay QR Button in Top Bar */}
-          <button
-            type="button"
-            className={`profile-nav-btn ${activeTab === "profile" ? "active" : ""}`}
-            onClick={() => setActiveTab("profile")}
-            title="My Profile & Scan-to-Pay QR Code"
-          >
-            <div className="profile-nav-avatar">
-              {role === "TREASURER" ? "AR" : "JL"}
-            </div>
-            <div className="profile-nav-info">
-              <span className="profile-nav-name">{role === "TREASURER" ? "Alex R." : "Jordan L."}</span>
-              <span className="profile-nav-role">{role}</span>
-            </div>
-            <span className="profile-nav-qr-icon" title="View Payment QR Code">
-              📷
-            </span>
-          </button>
         </div>
       </nav>
 
@@ -6500,344 +6475,6 @@ export default function OrbitApp() {
                 </div>
               </div>
             )}
-          </div>
-        )}
-
-        {/* ==================================================== */}
-        {/* VIEW G: PROFILE & INSTANT PAY-ME QR CODE TAB         */}
-        {/* ==================================================== */}
-        {activeTab === "profile" && (
-          <div style={{ maxWidth: "860px", margin: "0 auto" }}>
-            {/* Header Banner */}
-            <div
-              style={{
-                background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
-                borderRadius: "16px",
-                padding: "1.75rem",
-                color: "#ffffff",
-                marginBottom: "1.5rem",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexWrap: "wrap",
-                gap: "1rem",
-                boxShadow: "0 6px 20px rgba(0, 48, 135, 0.25)",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                <div
-                  style={{
-                    width: "58px",
-                    height: "58px",
-                    borderRadius: "50%",
-                    background: "#ffffff",
-                    color: "#003087",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: "1.45rem",
-                    fontWeight: 900,
-                    boxShadow: "0 4px 14px rgba(0, 0, 0, 0.15)",
-                  }}
-                >
-                  {role === "TREASURER" ? "AR" : "JL"}
-                </div>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                    <h2 style={{ margin: 0, fontSize: "1.6rem", fontWeight: 900 }}>
-                      {currentSessionName}
-                    </h2>
-                    <span
-                      style={{
-                        background: role === "TREASURER" ? "#10b981" : "#38bdf8",
-                        color: role === "TREASURER" ? "#ffffff" : "#002266",
-                        fontSize: "0.72rem",
-                        fontWeight: 800,
-                        padding: "0.2rem 0.6rem",
-                        borderRadius: "9999px",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      {role}
-                    </span>
-                  </div>
-                  <p style={{ margin: "0.25rem 0 0", fontSize: "0.88rem", opacity: 0.9 }}>
-                    {currentSessionEmail} • Verified PayPal Sandbox Account
-                  </p>
-                </div>
-              </div>
-
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setQrSeed(Date.now());
-                    setActionNotice({ text: "🔄 QR Code refreshed with latest payment session seed!", type: "info" });
-                  }}
-                  style={{
-                    background: "rgba(255, 255, 255, 0.2)",
-                    border: "1px solid rgba(255, 255, 255, 0.35)",
-                    color: "#ffffff",
-                    borderRadius: "9999px",
-                    padding: "0.45rem 1rem",
-                    fontSize: "0.82rem",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: "0.35rem",
-                  }}
-                >
-                  <span>🔄</span> Refresh QR
-                </button>
-              </div>
-            </div>
-
-            {/* Main Profile Grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-              {/* Left Column: Live QR Code Card */}
-              <div className="section-card" style={{ textAlign: "center", padding: "1.75rem 1.5rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                  <div style={{ textAlign: "left" }}>
-                    <h3 className="section-card-title" style={{ margin: 0 }}>
-                      Live Scan-to-Pay QR
-                    </h3>
-                    <p style={{ fontSize: "0.8rem", color: "var(--text-secondary)", margin: "0.15rem 0 0" }}>
-                      Instant camera scan to send funds directly
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setQrSeed(Date.now());
-                      setActionNotice({ text: "🔄 Fresh QR code generated!", type: "info" });
-                    }}
-                    title="Generate new QR token"
-                    style={{
-                      background: "#f1f5f9",
-                      border: "1px solid #cbd5e1",
-                      borderRadius: "6px",
-                      padding: "0.3rem 0.65rem",
-                      fontSize: "0.78rem",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      color: "#0f172a",
-                    }}
-                  >
-                    🔄 Refresh
-                  </button>
-                </div>
-
-                {/* QR Code Container */}
-                <div
-                  style={{
-                    background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
-                    borderRadius: "18px",
-                    padding: "1.5rem",
-                    display: "inline-block",
-                    boxShadow: "0 8px 24px rgba(0, 48, 135, 0.22)",
-                    marginBottom: "1rem",
-                  }}
-                >
-                  <div
-                    style={{
-                      background: "#ffffff",
-                      padding: "1.1rem",
-                      borderRadius: "14px",
-                      display: "inline-block",
-                      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.12)",
-                    }}
-                  >
-                    <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&margin=4&data=${encodeURIComponent(
-                        typeof window !== "undefined"
-                          ? `${window.location.origin}/?tab=send-request&recipient=${encodeURIComponent(currentSessionEmail)}${
-                              qrAmount ? `&amount=${encodeURIComponent(qrAmount)}` : ""
-                            }${qrNote ? `&note=${encodeURIComponent(qrNote)}` : ""}&t=${qrSeed}`
-                          : `https://paypal.me/${currentSessionEmail.split("@")[0]}`
-                      )}`}
-                      alt="PayPal Scan-to-Pay QR Code"
-                      style={{ width: "200px", height: "200px", display: "block" }}
-                    />
-                  </div>
-                  <div style={{ color: "#ffffff", marginTop: "0.85rem", fontSize: "0.82rem", fontWeight: 700 }}>
-                    {qrAmount ? (
-                      <span>Requesting {formatCurrency(qrAmount)}</span>
-                    ) : (
-                      <span>Open Amount • Scan to Pay</span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Action Links */}
-                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const payUrl =
-                        typeof window !== "undefined"
-                          ? `${window.location.origin}/?tab=send-request&recipient=${encodeURIComponent(currentSessionEmail)}${
-                              qrAmount ? `&amount=${encodeURIComponent(qrAmount)}` : ""
-                            }${qrNote ? `&note=${encodeURIComponent(qrNote)}` : ""}&t=${qrSeed}`
-                          : "";
-                      if (payUrl && navigator.clipboard) {
-                        navigator.clipboard.writeText(payUrl);
-                        setCopiedLink(true);
-                        setTimeout(() => setCopiedLink(false), 2500);
-                      }
-                      setActionNotice({
-                        text: `📋 Copied direct payment link for ${currentSessionEmail}!`,
-                        type: "success",
-                      });
-                    }}
-                    className="btn-navy-pill"
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      background: copiedLink ? "#ecfdf5" : "#ffffff",
-                      color: copiedLink ? "#065f46" : "#003087",
-                      border: copiedLink ? "1.5px solid #10b981" : "1.5px solid #003087",
-                      fontSize: "0.85rem",
-                      padding: "0.65rem",
-                      borderRadius: "10px",
-                    }}
-                  >
-                    {copiedLink ? "✓ Link Copied!" : "🔗 Copy Direct Link"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn-primary"
-                    onClick={() => {
-                      setSendEmail(currentSessionEmail);
-                      if (qrAmount) setSendAmount(qrAmount);
-                      if (qrNote) setSendNote(qrNote);
-                      setShowSendModal(true);
-                    }}
-                    style={{
-                      flex: 1,
-                      justifyContent: "center",
-                      fontSize: "0.85rem",
-                      padding: "0.65rem",
-                      borderRadius: "10px",
-                      color: "#ffffff",
-                    }}
-                  >
-                    💸 Test Pay Self
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Column: QR Code Customizer & Profile Settings */}
-              <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-                {/* Customize QR Request */}
-                <div className="section-card">
-                  <h3 className="section-card-title" style={{ marginBottom: "0.4rem" }}>
-                    Configure QR Payment
-                  </h3>
-                  <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginBottom: "1rem" }}>
-                    Set a pre-filled amount and payment note into the live QR code
-                  </p>
-
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
-                    <div className="form-group-field">
-                      <label className="form-field-label">
-                        Requested Amount ({currencyRates[selectedCurrency]?.label || "$ USD"}):
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        min="1"
-                        placeholder="Leave empty for open amount"
-                        value={qrAmount}
-                        onChange={(e) => setQrAmount(e.target.value)}
-                        className="form-input-text"
-                        style={{ fontSize: "0.95rem", fontWeight: 700 }}
-                      />
-                    </div>
-
-                    <div className="form-group-field">
-                      <label className="form-field-label">
-                        Payment Purpose / Note:
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Lunch split or team dues"
-                        value={qrNote}
-                        onChange={(e) => setQrNote(e.target.value)}
-                        className="form-input-text"
-                      />
-                    </div>
-
-                    <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.2rem" }}>
-                      {["10.00", "25.00", "50.00", "100.00"].map((preset) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setQrAmount(preset)}
-                          style={{
-                            padding: "0.35rem 0.75rem",
-                            borderRadius: "6px",
-                            border: qrAmount === preset ? "2px solid #003087" : "1px solid #cbd5e1",
-                            background: qrAmount === preset ? "#e0f2fe" : "#ffffff",
-                            color: qrAmount === preset ? "#003087" : "#475569",
-                            fontWeight: 700,
-                            fontSize: "0.82rem",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {formatCurrency(preset)}
-                        </button>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => setQrAmount("")}
-                        style={{
-                          padding: "0.35rem 0.75rem",
-                          borderRadius: "6px",
-                          border: "1px solid #cbd5e1",
-                          background: "#ffffff",
-                          color: "#64748b",
-                          fontSize: "0.82rem",
-                          cursor: "pointer",
-                        }}
-                      >
-                        Clear Amount
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Account Details & Role Card */}
-                <div className="section-card">
-                  <h3 className="section-card-title" style={{ marginBottom: "0.4rem" }}>
-                    Account Details
-                  </h3>
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", fontSize: "0.85rem", marginTop: "0.6rem" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: "0.5rem" }}>
-                      <span style={{ color: "#64748b" }}>Display Name:</span>
-                      <span style={{ fontWeight: 700, color: "#0f172a" }}>{currentSessionName}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: "0.5rem" }}>
-                      <span style={{ color: "#64748b" }}>Email:</span>
-                      <span style={{ fontWeight: 700, color: "#0070ba" }}>{currentSessionEmail}</span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: "0.5rem" }}>
-                      <span style={{ color: "#64748b" }}>Active Role:</span>
-                      <span style={{ fontWeight: 800, color: role === "TREASURER" ? "#10b981" : "#0284c7" }}>
-                        {role === "TREASURER" ? "Treasurer (Authorized)" : "Team Member"}
-                      </span>
-                    </div>
-                    <div style={{ display: "flex", justifyContent: "space-between" }}>
-                      <span style={{ color: "#64748b" }}>Current Entity:</span>
-                      <span style={{ fontWeight: 700, color: "#0f172a" }}>
-                        {activeClub ? activeClub.name : "Robotics Club Treasury"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </main>
