@@ -396,7 +396,7 @@ export default function OrbitApp() {
   const currentSessionEmail =
     role === "TREASURER" ? "treasurer@roboticsclub.org" : "jordan@roboticsclub.org";
   const currentSessionName =
-    role === "TREASURER" ? "Alex Rivera (Treasurer)" : "Jordan Lee (Member)";
+    role === "TREASURER" ? "Alex Rivera (Finance Controller)" : "Jordan Lee (Lead Systems Engineer)";
 
   // Step 7: Orbit AI Command Bar & Copilot State
   const [aiQuery, setAiQuery] = useState<string>("");
@@ -1802,8 +1802,8 @@ export default function OrbitApp() {
                     }
                   }}
                 >
-                  Clubs & Treasury
-                  <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Club</span>
+                  Organizations & Treasury
+                  <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Treasury</span>
                 </button>
               </li>
             </ul>
@@ -2032,8 +2032,8 @@ export default function OrbitApp() {
                   }
                 }}
               >
-                Clubs & Treasury
-                <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Club</span>
+                Organizations & Treasury
+                <span className="nav-badge-pill" style={{ background: "#7c3aed" }}>Treasury</span>
               </button>
             </li>
             <li>
@@ -2202,13 +2202,13 @@ export default function OrbitApp() {
                     </span>
                     {[
                       { label: "🔮 Predict Burn-Rate & Overspends", query: "analyze this month's burn rate and predict budget overspends" },
-                      { label: "📊 Consolidate Jordan", query: "consolidate payments for jordan@roboticsclub.org" },
-                      { label: "🏢 Consolidate Robotics Club", query: "consolidate payments for Robotics Club" },
+                      { label: "📊 Consolidate Jordan (Engineering)", query: "consolidate payments for jordan@roboticsclub.org" },
+                      { label: "🏢 Consolidate Apex Robotics", query: "consolidate payments for Apex Robotics Dynamics" },
                       { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
                       { label: "📈 Where did our money go?", query: "where did our money go? Summarize recent spending from the ledger." },
-                      { label: "⚡ Send Jordan $25 for parts", query: "draft sending $25 to jordan@roboticsclub.org for parts" },
-                      { label: "💰 Calculate dues for $600 (12 members)", query: "calculate dues for a $600 club budget with 12 members and a 10% buffer" },
-                      { label: "⚠️ Check anomalies & spikes", query: "check our club finances for any anomalies, spikes, or limit breaches" },
+                      { label: "⚡ Disburse $250 for Components", query: "draft sending $250 to jordan@roboticsclub.org for lab components" },
+                      { label: "💰 Compute Retainers ($6,000 Budget)", query: "calculate retainers for a $6000 operating budget with 12 partners and a 10% contingency buffer" },
+                      { label: "⚠️ Audit & Anomaly Detection", query: "audit our corporate treasury for any anomalies, spikes, or budget limit breaches" },
                     ].map((chip) => (
                       <button
                         key={chip.label}
@@ -2686,7 +2686,7 @@ export default function OrbitApp() {
                       }
                     }}
                   >
-                    Open Club Treasury Hub (Dues, Claims, Ledger) ➔
+                    Open Organization Treasury Hub (Retainers, Claims, Ledger) ➔
                   </button>
                 </div>
               </div>
@@ -5115,9 +5115,9 @@ export default function OrbitApp() {
             >
               {[
                 { id: "overview", label: "Overview", icon: "📊" },
-                { id: "fundraiser", label: `Fundraiser (${events.length})`, icon: "🎯" },
-                { id: "dues", label: `Dues (${duesCycles.length})`, icon: "📩" },
-                { id: "requests", label: `Requests (${claims.length})`, icon: "🧾" },
+                { id: "fundraiser", label: `Capital Projects (${events.length})`, icon: "🎯" },
+                { id: "dues", label: `Retainers & Invoices (${duesCycles.length})`, icon: "📩" },
+                { id: "requests", label: `Expense Claims (${claims.length})`, icon: "🧾" },
                 { id: "ledger", label: "Shared Ledger & Audit", icon: "📖" },
               ].map((tab) => (
                 <button
@@ -5530,7 +5530,7 @@ export default function OrbitApp() {
                         style={{ width: "100%", justifyContent: "center" }}
                         onClick={() => setClubSubTab("dues")}
                       >
-                        📩 Issue or View Season Dues
+                        📩 Issue or View Retainer Invoices
                       </button>
                       <button
                         type="button"
@@ -5544,7 +5544,7 @@ export default function OrbitApp() {
                         }}
                         onClick={() => setClubSubTab("requests")}
                       >
-                        🧾 Submit or Review Reimbursements
+                        🧾 Submit or Review Expense Claims
                       </button>
 
                       <button
@@ -5560,7 +5560,7 @@ export default function OrbitApp() {
                         }}
                         onClick={() => setClubSubTab("fundraiser")}
                       >
-                        🎯 View Team Fundraiser & Progress
+                        🎯 View Capital Projects & Progress
                       </button>
                     </div>
                   </div>
@@ -5610,9 +5610,9 @@ export default function OrbitApp() {
                 {events.length === 0 ? (
                   <div className="section-card" style={{ textAlign: "center", padding: "3rem" }}>
                     <div style={{ fontSize: "3rem", marginBottom: "0.5rem" }}>🎯</div>
-                    <h3 style={{ fontSize: "1.3rem", fontWeight: 800 }}>No Active Fundraisers Yet</h3>
+                    <h3 style={{ fontSize: "1.3rem", fontWeight: 800 }}>No Active Capital Projects Yet</h3>
                     <p style={{ color: "var(--text-secondary)", marginTop: "0.4rem" }}>
-                      Launch an event fundraiser to collect contributions directly via PayPal Orders v2 into the unified ledger.
+                      Launch a capital project to collect funding directly via PayPal Orders v2 into the unified treasury ledger.
                     </p>
                   </div>
                 ) : (
@@ -5671,7 +5671,7 @@ export default function OrbitApp() {
                                     letterSpacing: "0.05em",
                                   }}
                                 >
-                                  🎯 Event Fundraiser
+                                  🎯 Capital Project / Initiative
                                 </span>
                                 <span
                                   style={{
@@ -5977,9 +5977,9 @@ export default function OrbitApp() {
                   <div className="section-card" style={{ marginTop: "1.5rem" }}>
                     <div className="section-card-header">
                       <div>
-                        <h3 className="section-card-title">Launch New Event Fundraiser</h3>
+                        <h3 className="section-card-title">Launch Capital Project / Initiative</h3>
                         <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-                          Treasurer authority: Set up target goals and dedicated tag for club campaigns
+                          Finance Controller authority: Establish funding targets and track project contributions
                         </p>
                       </div>
                     </div>
@@ -6056,9 +6056,9 @@ export default function OrbitApp() {
                   <div className="section-card" style={{ marginBottom: "1.5rem" }}>
                     <div className="section-card-header">
                       <div>
-                        <h3 className="section-card-title">Set New Dues Cycle</h3>
+                        <h3 className="section-card-title">Issue Corporate Retainers & Assessments</h3>
                         <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-                          Treasurer authority: Issues PayPal Invoicing v2 requests for each team member
+                          Finance Controller authority: Issues PayPal Invoicing v2 requests to all entity partners
                         </p>
                       </div>
                       <span
@@ -6303,9 +6303,9 @@ export default function OrbitApp() {
               <div className="club-claims-grid">
                 {/* Submit Claim Card */}
                 <div className="section-card">
-                  <h3 className="section-card-title">Submit a Reimbursement Claim</h3>
+                  <h3 className="section-card-title">Submit Corporate Expense Claim</h3>
                   <p style={{ fontSize: "0.82rem", color: "var(--text-secondary)", marginBottom: "1rem" }}>
-                    Members & Treasurer can submit out-of-pocket receipts for club review
+                    Team members & officers can submit out-of-pocket receipts for corporate review
                   </p>
 
                   <form onSubmit={handleSubmitClaim} className="modal-form-stack">
@@ -6976,13 +6976,13 @@ export default function OrbitApp() {
                     <div style={{ display: "flex", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: "0.5rem" }}>
                       <span style={{ color: "#64748b" }}>Active Role:</span>
                       <span style={{ fontWeight: 800, color: role === "TREASURER" ? "#10b981" : "#0284c7" }}>
-                        {role === "TREASURER" ? "Treasurer (Authorized)" : "Team Member"}
+                        {role === "TREASURER" ? "Finance Controller (Authorized)" : "Team Contributor"}
                       </span>
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between" }}>
                       <span style={{ color: "#64748b" }}>Current Entity:</span>
                       <span style={{ fontWeight: 700, color: "#0f172a" }}>
-                        {activeClub ? activeClub.name : "Robotics Club Treasury"}
+                        {activeClub ? activeClub.name : "Apex Robotics Dynamics Treasury"}
                       </span>
                     </div>
                   </div>
@@ -7670,13 +7670,13 @@ export default function OrbitApp() {
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.85rem" }}>
                 <span style={{ color: "#64748b" }}>Active Role:</span>
                 <span style={{ fontWeight: 800, color: role === "TREASURER" ? "#10b981" : "#0284c7" }}>
-                  {role === "TREASURER" ? "Treasurer (Authorized)" : "Team Member"}
+                  {role === "TREASURER" ? "Finance Controller (Authorized)" : "Team Contributor"}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.85rem" }}>
                 <span style={{ color: "#64748b" }}>Associated Entity:</span>
                 <span style={{ fontWeight: 700, color: "#0f172a" }}>
-                  {activeClub ? activeClub.name : "Robotics Club Treasury"}
+                  {activeClub ? activeClub.name : "Apex Robotics Dynamics Treasury"}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
@@ -8000,7 +8000,7 @@ export default function OrbitApp() {
               {[
                 { label: "🔮 Predict Burn-Rate", query: "analyze this month's burn rate and predict budget overspends" },
                 { label: "📊 Consolidate Jordan", query: "consolidate payments for jordan@roboticsclub.org" },
-                { label: "🏢 Consolidate Robotics Club", query: "consolidate payments for Robotics Club" },
+                { label: "🏢 Consolidate Apex Robotics", query: "consolidate payments for Apex Robotics Dynamics" },
                 { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
                 { label: "📈 Where did money go?", query: "where did our money go? Summarize recent spending from the ledger." },
                 { label: "⚠️ Anomalies", query: "check our club finances for any anomalies, spikes, or limit breaches" },

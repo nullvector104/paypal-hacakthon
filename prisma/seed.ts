@@ -19,31 +19,31 @@ async function main() {
     });
   }
 
-  // Seed default Demo Club & Members
+  // Seed default Demo Organization & Members
   let club = await prisma.club.findFirst({
-    where: { name: "Robotics Club" },
+    where: { name: { in: ["Apex Robotics Dynamics Corp", "Robotics Club"] } },
   });
 
   if (!club) {
     club = await prisma.club.create({
       data: {
-        name: "Robotics Club",
-        description: "Campus autonomous robotics treasury & competition budget",
+        name: "Apex Robotics Dynamics Corp",
+        description: "Autonomous robotics engineering, global component procurement & R&D treasury vault",
         balance: 1450.0,
         members: {
           create: [
             {
-              name: "Alex Vance (Treasurer)",
+              name: "Alex Vance (Finance Controller)",
               email: "treasurer@roboticsclub.org",
               role: "TREASURER",
             },
             {
-              name: "Jordan Lee (Member)",
+              name: "Jordan Lee (Lead Systems Engineer)",
               email: "jordan@roboticsclub.org",
               role: "MEMBER",
             },
             {
-              name: "Sam Taylor (Member)",
+              name: "Sam Taylor (Hardware Operations Lead)",
               email: "sam@roboticsclub.org",
               role: "MEMBER",
             },

@@ -1,0 +1,197 @@
+[
+  {
+    "id": "cmvvyfc7r0005gx287amj09k2",
+    "name": "Robotics Club",
+    "description": "Campus autonomous robotics treasury & competition budget",
+    "balance": 1200,
+    "createdAt": "2026-10-31T05:22:16.600Z",
+    "updatedAt": "2026-11-02T16:32:17.537Z",
+    "members": [
+      {
+        "id": "cmvvyfc7r0006gx286i9ct8in",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "name": "Alex Vance (Treasurer)",
+        "email": "treasurer@roboticsclub.org",
+        "role": "TREASURER",
+        "createdAt": "2026-10-31T05:22:16.600Z",
+        "updatedAt": "2026-10-31T05:22:16.600Z"
+      },
+      {
+        "id": "cmvvyfc7r0007gx285nmtevnn",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "name": "Jordan Lee (Member)",
+        "email": "jordan@roboticsclub.org",
+        "role": "MEMBER",
+        "createdAt": "2026-10-31T05:22:16.600Z",
+        "updatedAt": "2026-10-31T05:22:16.600Z"
+      },
+      {
+        "id": "cmvvyfc7r0008gx284oyqyc8y",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "name": "Sam Taylor (Member)",
+        "email": "sam@roboticsclub.org",
+        "role": "MEMBER",
+        "createdAt": "2026-10-31T05:22:16.600Z",
+        "updatedAt": "2026-10-31T05:22:16.600Z"
+      }
+    ],
+    "duesCycles": [
+      {
+        "id": "cmvz9xcqp0001gx60ebk84p5u",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "title": "Championship Dues 2026",
+        "amount": 40,
+        "dueDate": "2026-11-09T13:07:30.946Z",
+        "createdAt": "2026-11-02T13:07:31.391Z",
+        "updatedAt": "2026-11-02T13:07:31.391Z"
+      },
+      {
+        "id": "cmvz9y90z000jgx609eu7h3fl",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "title": "Championship Dues 2026",
+        "amount": 40,
+        "dueDate": "2026-11-09T13:08:12.974Z",
+        "createdAt": "2026-11-02T13:08:13.236Z",
+        "updatedAt": "2026-11-02T13:08:13.236Z"
+      }
+    ],
+    "claims": [
+      {
+        "id": "cmvz9xma8000fgx607y3ngvb6",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "requesterEmail": "treasurer@roboticsclub.org",
+        "requesterName": "Alex Vance (Treasurer)",
+        "amount": 12,
+        "note": "Screws & 3D Printer Filament",
+        "tagId": "cmvvyfcr3000agx28mbzero4f",
+        "status": "APPROVED",
+        "reviewedBy": "treasurer@roboticsclub.org",
+        "reviewedAt": "2026-11-02T13:07:45.154Z",
+        "rejectionReason": null,
+        "flaggedSelfApproved": true,
+        "movementId": null,
+        "createdAt": "2026-11-02T13:07:43.760Z",
+        "updatedAt": "2026-11-02T13:07:45.156Z"
+      },
+      {
+        "id": "cmvz9yfn0000xgx60qfwvevb9",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "requesterEmail": "treasurer@roboticsclub.org",
+        "requesterName": "Alex Vance (Treasurer)",
+        "amount": 12,
+        "note": "Screws & 3D Printer Filament",
+        "tagId": "cmvvyfcr3000agx28mbzero4f",
+        "status": "PAID",
+        "reviewedBy": "treasurer@roboticsclub.org",
+        "reviewedAt": "2026-11-02T13:08:22.905Z",
+        "rejectionReason": null,
+        "flaggedSelfApproved": true,
+        "movementId": "cmvz9yh1k0011gx60ik4oy3zc",
+        "createdAt": "2026-11-02T13:08:21.804Z",
+        "updatedAt": "2026-11-02T13:08:23.781Z"
+      },
+      {
+        "id": "cmvz9yf2s000tgx60yvk1mw0w",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "requesterEmail": "jordan@roboticsclub.org",
+        "requesterName": "Jordan Lee",
+        "amount": 18.5,
+        "note": "Ultrasonic Sensors for Maze Robot",
+        "tagId": "cmvvyfcr3000agx28mbzero4f",
+        "status": "REJECTED",
+        "reviewedBy": "treasurer@roboticsclub.org",
+        "reviewedAt": "2026-11-02T13:08:26.042Z",
+        "rejectionReason": "Please attach receipt or part order link from supplier",
+        "flaggedSelfApproved": false,
+        "movementId": null,
+        "createdAt": "2026-11-02T13:08:21.077Z",
+        "updatedAt": "2026-11-02T13:08:26.043Z"
+      },
+      {
+        "id": "cmvz9xknk000bgx60qhgkyn3t",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "requesterEmail": "jordan@roboticsclub.org",
+        "requesterName": "Jordan Lee",
+        "amount": 18.5,
+        "note": "Ultrasonic Sensors for Maze Robot",
+        "tagId": "cmvvyfcr3000agx28mbzero4f",
+        "status": "PAID",
+        "reviewedBy": "treasurer@roboticsclub.org",
+        "reviewedAt": "2026-11-06T03:39:27.226Z",
+        "rejectionReason": null,
+        "flaggedSelfApproved": false,
+        "movementId": "cmw4fe7vr0005gxngliqqbk1u",
+        "createdAt": "2026-11-02T13:07:41.648Z",
+        "updatedAt": "2026-11-06T03:39:27.396Z"
+      }
+    ],
+    "events": [
+      {
+        "id": "cmvzar0qo0003gxywguu4l8mk",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "title": "Autonomous Robotics World Finals 2026",
+        "description": "Support our university team travel and kit budget for the International Championship in Tokyo!",
+        "goalAmount": 800,
+        "tagId": "cmvzar0m70001gxywmvczspgj",
+        "status": "ACTIVE",
+        "createdAt": "2026-11-02T13:30:35.520Z",
+        "updatedAt": "2026-11-02T13:30:35.520Z"
+      },
+      {
+        "id": "cmvzaz4p5000dgxywa8v4j28x",
+        "clubId": "cmvvyfc7r0005gx287amj09k2",
+        "title": "Robotics Tokyo Expo 3530",
+        "description": "Autonomous drone and rover competition budget in Tokyo, Japan.",
+        "goalAmount": 600,
+        "tagId": "cmvzaz4ke000bgxywufnyia87",
+        "status": "ACTIVE",
+        "createdAt": "2026-11-02T13:36:53.898Z",
+        "updatedAt": "2026-11-02T13:36:53.898Z"
+      }
+    ]
+  },
+  {
+    "id": "cmw53akul0000gxp0536m21fe",
+    "name": "Photography Society",
+    "description": "Campus photography workshops and photo walks",
+    "balance": 0,
+    "createdAt": "2026-11-06T14:48:28.170Z",
+    "updatedAt": "2026-11-06T14:48:28.170Z",
+    "members": [
+      {
+        "id": "cmw53akun0001gxp0kqar45b2",
+        "clubId": "cmw53akul0000gxp0536m21fe",
+        "name": "Elena Rostova",
+        "email": "elena@photoclub.org",
+        "role": "TREASURER",
+        "createdAt": "2026-11-06T14:48:28.170Z",
+        "updatedAt": "2026-11-06T14:48:28.170Z"
+      }
+    ],
+    "duesCycles": [],
+    "claims": [],
+    "events": []
+  },
+  {
+    "id": "cmw53pvym0008gxp00yrlpcl0",
+    "name": "hacakthon club",
+    "description": null,
+    "balance": 0,
+    "createdAt": "2026-11-06T15:00:22.337Z",
+    "updatedAt": "2026-11-06T15:00:22.337Z",
+    "members": [
+      {
+        "id": "cmw53pvym0009gxp0f3urbtdi",
+        "clubId": "cmw53pvym0008gxp00yrlpcl0",
+        "name": "Alex Morgan",
+        "email": "treasurer@club.org",
+        "role": "TREASURER",
+        "createdAt": "2026-11-06T15:00:22.337Z",
+        "updatedAt": "2026-11-06T15:00:22.337Z"
+      }
+    ],
+    "duesCycles": [],
+    "claims": [],
+    "events": []
+  }
+]
