@@ -1807,8 +1807,8 @@ export default function OrbitApp() {
               </li>
             </ul>
 
-            {/* Role Switcher Pill */}
-            <div className="role-switcher-capsule" style={{ padding: "0.15rem 0.25rem" }} title="Toggle Demo User Role">
+            {/* Role Switcher Pill (Desktop) */}
+            <div className="role-switcher-capsule desktop-only" style={{ padding: "0.15rem 0.25rem" }} title="Toggle Demo User Role">
               <button
                 type="button"
                 className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
@@ -1829,12 +1829,32 @@ export default function OrbitApp() {
           </div>
 
           <div className="top-nav-right">
-            {/* Quick Tools: Copilot & Currency */}
-            <div className="top-nav-tools-group" style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
-              {/* Orbit Copilot Toggle Pill */}
+            {/* Role Switcher Pill (Mobile) */}
+            <div className="role-switcher-capsule mobile-only" style={{ padding: "0.1rem 0.2rem" }} title="Toggle Demo User Role">
               <button
                 type="button"
-                className="copilot-nav-toggle-btn"
+                className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
+                style={{ padding: "0.18rem 0.45rem", fontSize: "0.68rem" }}
+                onClick={() => setRole("TREASURER")}
+              >
+                Treas
+              </button>
+              <button
+                type="button"
+                className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
+                style={{ padding: "0.18rem 0.45rem", fontSize: "0.68rem" }}
+                onClick={() => setRole("MEMBER")}
+              >
+                Mem
+              </button>
+            </div>
+
+            {/* Quick Tools: Copilot & Currency */}
+            <div className="top-nav-tools-group" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
+              {/* Orbit Copilot Toggle Pill (Desktop Only) */}
+              <button
+                type="button"
+                className="copilot-nav-toggle-btn desktop-only"
                 onClick={() => setCopilotOpen((prev) => !prev)}
                 style={{
                   background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
@@ -1854,7 +1874,7 @@ export default function OrbitApp() {
                 title="Toggle Orbit AI Copilot"
               >
                 <span style={{ fontSize: "0.78rem" }}>✨</span>
-                <span className="copilot-label-text">Copilot</span>
+                <span>Copilot</span>
               </button>
 
               {/* Compact Currency Dropdown */}
@@ -1874,8 +1894,8 @@ export default function OrbitApp() {
                     color: "#ffffff",
                     border: "1px solid rgba(255, 255, 255, 0.3)",
                     borderRadius: "9999px",
-                    padding: "0.32rem 0.65rem",
-                    fontSize: "0.78rem",
+                    padding: "0.28rem 0.55rem",
+                    fontSize: "0.75rem",
                     fontWeight: 800,
                     cursor: "pointer",
                     outline: "none",
@@ -1906,10 +1926,10 @@ export default function OrbitApp() {
                 background: activeTab === "profile" ? "#ffffff" : "rgba(255, 255, 255, 0.15)",
                 border: activeTab === "profile" ? "1.5px solid #ffffff" : "1px solid rgba(255, 255, 255, 0.3)",
                 borderRadius: "9999px",
-                padding: "0.22rem 0.75rem 0.22rem 0.3rem",
+                padding: "0.22rem 0.55rem 0.22rem 0.3rem",
                 display: "flex",
                 alignItems: "center",
-                gap: "0.45rem",
+                gap: "0.35rem",
                 cursor: "pointer",
                 color: activeTab === "profile" ? "#003087" : "#ffffff",
                 boxShadow: activeTab === "profile" ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
@@ -1929,11 +1949,12 @@ export default function OrbitApp() {
                   fontWeight: 900,
                   color: "#ffffff",
                   border: "1px solid rgba(255, 255, 255, 0.6)",
+                  flexShrink: 0,
                 }}
               >
                 {role === "TREASURER" ? "AR" : "JL"}
               </div>
-              <div className="profile-nav-text-block" style={{ textAlign: "left", lineHeight: 1.15 }}>
+              <div className="profile-nav-text-block desktop-only" style={{ textAlign: "left", lineHeight: 1.15 }}>
                 <span style={{ fontSize: "0.76rem", fontWeight: 800, display: "block", color: activeTab === "profile" ? "#003087" : "#ffffff" }}>
                   {role === "TREASURER" ? "Alex R." : "Jordan L."}
                 </span>
@@ -2088,15 +2109,16 @@ export default function OrbitApp() {
             {/* Step 7: ORBIT AI FINANCIAL & TREASURY COMMAND BAR (Minimizable & Dockable) */}
             <div className="ai-command-container">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
                   <span className="ai-header-badge">✨ Orbit Copilot</span>
-                  <span style={{ fontSize: "0.82rem", color: "#64748b", fontWeight: 600 }}>
+                  <span className="desktop-only" style={{ fontSize: "0.82rem", color: "#64748b", fontWeight: 600 }}>
                     Natural language financial commands, payment consolidation & ledger intelligence
                   </span>
                 </div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
                   <button
                     type="button"
+                    className="desktop-only"
                     onClick={() => setCopilotDock(copilotDock === "right" ? "left" : "right")}
                     style={{
                       background: "#f1f5f9",
@@ -2128,7 +2150,7 @@ export default function OrbitApp() {
                   >
                     {copilotMinimizedInline ? "Extend Copilot ↗" : "— Minimize"}
                   </button>
-                  <span style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "0.2rem 0.55rem", borderRadius: "6px", color: "#475569", fontWeight: 700 }}>
+                  <span className="desktop-only" style={{ fontSize: "0.75rem", background: "#f1f5f9", padding: "0.2rem 0.55rem", borderRadius: "6px", color: "#475569", fontWeight: 700 }}>
                     Active Model: Gemini 2.5/3.5 Flash
                   </span>
                 </div>
@@ -6742,19 +6764,21 @@ export default function OrbitApp() {
                   style={{
                     background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
                     borderRadius: "18px",
-                    padding: "1.5rem",
+                    padding: "1.15rem",
                     display: "inline-block",
                     boxShadow: "0 8px 24px rgba(0, 48, 135, 0.22)",
                     marginBottom: "1rem",
+                    maxWidth: "100%",
                   }}
                 >
                   <div
                     style={{
                       background: "#ffffff",
-                      padding: "1.1rem",
+                      padding: "0.85rem",
                       borderRadius: "14px",
                       display: "inline-block",
                       boxShadow: "0 4px 12px rgba(0, 0, 0, 0.12)",
+                      maxWidth: "100%",
                     }}
                   >
                     <img
@@ -6766,7 +6790,7 @@ export default function OrbitApp() {
                           : `https://paypal.me/${currentSessionEmail.split("@")[0]}`
                       )}`}
                       alt="PayPal Scan-to-Pay QR Code"
-                      style={{ width: "200px", height: "200px", display: "block" }}
+                      style={{ width: "180px", height: "180px", maxWidth: "100%", display: "block", margin: "0 auto" }}
                     />
                   </div>
                   <div style={{ color: "#ffffff", marginTop: "0.85rem", fontSize: "0.82rem", fontWeight: 700 }}>
@@ -6779,7 +6803,7 @@ export default function OrbitApp() {
                 </div>
 
                 {/* Action Links */}
-                <div style={{ display: "flex", gap: "0.75rem", marginTop: "0.5rem" }}>
+                <div style={{ display: "flex", gap: "0.6rem", marginTop: "0.5rem", flexWrap: "wrap" }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -6802,12 +6826,13 @@ export default function OrbitApp() {
                     className="btn-navy-pill"
                     style={{
                       flex: 1,
+                      minWidth: "130px",
                       justifyContent: "center",
                       background: copiedLink ? "#ecfdf5" : "#ffffff",
                       color: copiedLink ? "#065f46" : "#003087",
                       border: copiedLink ? "1.5px solid #10b981" : "1.5px solid #003087",
-                      fontSize: "0.85rem",
-                      padding: "0.65rem",
+                      fontSize: "0.82rem",
+                      padding: "0.65rem 0.5rem",
                       borderRadius: "10px",
                     }}
                   >
@@ -6825,9 +6850,10 @@ export default function OrbitApp() {
                     }}
                     style={{
                       flex: 1,
+                      minWidth: "130px",
                       justifyContent: "center",
-                      fontSize: "0.85rem",
-                      padding: "0.65rem",
+                      fontSize: "0.82rem",
+                      padding: "0.65rem 0.5rem",
                       borderRadius: "10px",
                       color: "#ffffff",
                     }}

@@ -2210,6 +2210,14 @@ body {
 /* MOBILE RESPONSIVENESS & NATIVE DOCK STYLES           */
 /* ==================================================== */
 
+/* Utility visibility classes */
+.desktop-only {
+  display: flex !important;
+}
+.mobile-only {
+  display: none !important;
+}
+
 /* Responsive Stacks for Multi-Column Grids */
 .profile-grid {
   display: grid;
@@ -2586,12 +2594,86 @@ body {
     gap: 0.75rem !important;
   }
 
+  /* Utility visibility classes */
+  .desktop-only {
+    display: none !important;
+  }
+  .mobile-only {
+    display: flex !important;
+  }
+
+  /* Right column actions (Send / Request pills) */
+  .right-primary-actions {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.6rem !important;
+    margin-bottom: 1.25rem !important;
+  }
+
+  .btn-primary-send,
+  .btn-primary-request {
+    font-size: 0.95rem !important;
+    padding: 0.75rem 0.5rem !important;
+    gap: 0.35rem !important;
+  }
+
+  /* Universal button text wrapping on mobile */
+  .btn-navy-pill,
+  .btn-primary,
+  .btn-promo-white-pill {
+    white-space: normal !important;
+    word-break: break-word !important;
+    text-align: center !important;
+  }
+
   /* Club selector scroll */
-  .club-scroll-select {
+  .club-scroll-select,
+  .club-scroll-select-dark {
     max-width: 100% !important;
     width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Ensure card headers wrap cleanly */
+  .section-card-header {
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+
+  .section-card-title {
+    font-size: 1.1rem !important;
+  }
+
+  /* Universal anti-overflow shield for mobile viewports */
+  .app-container,
+  main,
+  .top-navbar,
+  .top-navbar-main,
+  .dashboard-grid,
+  .section-card,
+  .promo-cards-row,
+  .ai-command-container,
+  .card-link-banner,
+  .profile-header-banner,
+  .profile-grid {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Ensure flex children don't force overflow */
+  input, select, textarea {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Break long strings, emails, and URLs */
+  p, span, h1, h2, h3, h4, h5, h6, strong, a, label {
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 }
+
 
 
 
