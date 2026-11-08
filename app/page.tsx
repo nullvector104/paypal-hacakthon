@@ -613,6 +613,13 @@ export default function OrbitApp() {
   // Digital Receipt Modal State
   const [viewingReceiptMovement, setViewingReceiptMovement] = useState<Movement | null>(null);
 
+  // Profile Modal State & QR
+  const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+  const [qrAmount, setQrAmount] = useState<string>("");
+  const [qrNote, setQrNote] = useState<string>("Payment to " + currentSessionName);
+  const [qrSeed, setQrSeed] = useState<number>(Date.now());
+  const [copiedLink, setCopiedLink] = useState<boolean>(false);
+
   // One-Click Export Ledger to CSV
   const exportLedgerToCsv = () => {
     if (movements.length === 0) {
@@ -1791,92 +1798,140 @@ export default function OrbitApp() {
               </button>
             </li>
           </ul>
-        </div>
 
-        <div className="top-nav-right">
-          {/* Orbit Copilot Toggle Pill */}
-          <button
-            type="button"
-            className="copilot-nav-toggle-btn"
-            onClick={() => setCopilotOpen((prev) => !prev)}
-            style={{
-              background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
-              color: "#ffffff",
-              border: "1px solid rgba(255, 255, 255, 0.35)",
-              padding: "0.38rem 0.85rem",
-              borderRadius: "9999px",
-              fontSize: "0.82rem",
-              fontWeight: 800,
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              gap: "0.35rem",
-              boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
-              transition: "all 0.2s ease",
-            }}
-            title="Toggle Orbit AI Copilot"
-          >
-            <span style={{ fontSize: "0.8rem" }}>✨</span>
-            <span>Copilot</span>
-          </button>
-
-          {/* Compact Currency Dropdown */}
-          <div style={{ position: "relative", display: "inline-block" }}>
-            <select
-              value={selectedCurrency}
-              onChange={(e) => {
-                const cur = e.target.value as SupportedCurrency;
-                setSelectedCurrency(cur);
-                setActionNotice({
-                  text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`,
-                  type: "info",
-                });
-              }}
+          {/* Quick Utility Tools Docked Next to Links */}
+          <div style={{ display: "flex", alignItems: "center", gap: "0.45rem", marginLeft: "0.5rem" }}>
+            {/* Orbit Copilot Toggle Pill */}
+            <button
+              type="button"
+              className="copilot-nav-toggle-btn"
+              onClick={() => setCopilotOpen((prev) => !prev)}
               style={{
-                background: "rgba(0, 0, 0, 0.28)",
+                background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
                 color: "#ffffff",
-                border: "1px solid rgba(255, 255, 255, 0.3)",
+                border: "1px solid rgba(255, 255, 255, 0.35)",
+                padding: "0.32rem 0.75rem",
                 borderRadius: "9999px",
-                padding: "0.38rem 0.75rem",
                 fontSize: "0.8rem",
                 fontWeight: 800,
                 cursor: "pointer",
-                outline: "none",
-                backdropFilter: "blur(4px)",
+                display: "flex",
+                alignItems: "center",
+                gap: "0.35rem",
+                boxShadow: "0 2px 8px rgba(0, 0, 0, 0.2)",
+                transition: "all 0.2s ease",
               }}
-              title="Select Display Currency"
+              title="Toggle Orbit AI Copilot"
             >
-              <option value="USD" style={{ color: "#0f172a", background: "#ffffff" }}>
-                $ USD
-              </option>
-              <option value="EUR" style={{ color: "#0f172a", background: "#ffffff" }}>
-                € EUR
-              </option>
-              <option value="GBP" style={{ color: "#0f172a", background: "#ffffff" }}>
-                £ GBP
-              </option>
-            </select>
-          </div>
+              <span style={{ fontSize: "0.78rem" }}>✨</span>
+              <span>Copilot</span>
+            </button>
 
-          {/* Demo Role Switcher Capsule */}
-          <div className="role-switcher-capsule" style={{ padding: "0.2rem 0.3rem" }} title="Toggle Demo User Role">
-            <button
-              type="button"
-              className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
-              style={{ padding: "0.28rem 0.75rem", fontSize: "0.78rem" }}
-              onClick={() => setRole("TREASURER")}
-            >
-              Treasurer
-            </button>
-            <button
-              type="button"
-              className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
-              style={{ padding: "0.28rem 0.75rem", fontSize: "0.78rem" }}
-              onClick={() => setRole("MEMBER")}
-            >
-              Member
-            </button>
+            {/* Compact Currency Dropdown */}
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <select
+                value={selectedCurrency}
+                onChange={(e) => {
+                  const cur = e.target.value as SupportedCurrency;
+                  setSelectedCurrency(cur);
+                  setActionNotice({
+                    text: `💱 Currency switched to ${cur} (${currencyRates[cur].symbol})`,
+                    type: "info",
+                  });
+                }}
+                style={{
+                  background: "rgba(0, 0, 0, 0.28)",
+                  color: "#ffffff",
+                  border: "1px solid rgba(255, 255, 255, 0.3)",
+                  borderRadius: "9999px",
+                  padding: "0.32rem 0.65rem",
+                  fontSize: "0.78rem",
+                  fontWeight: 800,
+                  cursor: "pointer",
+                  outline: "none",
+                  backdropFilter: "blur(4px)",
+                }}
+                title="Select Display Currency"
+              >
+                <option value="USD" style={{ color: "#0f172a", background: "#ffffff" }}>
+                  $ USD
+                </option>
+                <option value="EUR" style={{ color: "#0f172a", background: "#ffffff" }}>
+                  € EUR
+                </option>
+                <option value="GBP" style={{ color: "#0f172a", background: "#ffffff" }}>
+                  £ GBP
+                </option>
+              </select>
+            </div>
+
+            {/* Demo Role Switcher Capsule */}
+            <div className="role-switcher-capsule" style={{ padding: "0.15rem 0.25rem" }} title="Toggle Demo User Role">
+              <button
+                type="button"
+                className={`role-switch-btn ${role === "TREASURER" ? "active" : ""}`}
+                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
+                onClick={() => setRole("TREASURER")}
+              >
+                Treasurer
+              </button>
+              <button
+                type="button"
+                className={`role-switch-btn ${role === "MEMBER" ? "active" : ""}`}
+                style={{ padding: "0.22rem 0.6rem", fontSize: "0.75rem" }}
+                onClick={() => setRole("MEMBER")}
+              >
+                Member
+              </button>
+            </div>
           </div>
+        </div>
+
+        <div className="top-nav-right">
+          {/* Profile & Account Button */}
+          <button
+            type="button"
+            className="profile-nav-btn"
+            onClick={() => setShowProfileModal(true)}
+            title="My Account Profile & Instant Payment Link"
+            style={{
+              background: "rgba(255, 255, 255, 0.15)",
+              border: "1px solid rgba(255, 255, 255, 0.3)",
+              borderRadius: "9999px",
+              padding: "0.22rem 0.65rem 0.22rem 0.3rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.45rem",
+              cursor: "pointer",
+              color: "#ffffff",
+            }}
+          >
+            <div
+              style={{
+                width: "28px",
+                height: "28px",
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, #0070ba 0%, #003087 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "0.74rem",
+                fontWeight: 900,
+                color: "#ffffff",
+                border: "1px solid rgba(255, 255, 255, 0.6)",
+              }}
+            >
+              {role === "TREASURER" ? "AR" : "JL"}
+            </div>
+            <div style={{ textAlign: "left", lineHeight: 1.15 }}>
+              <span style={{ fontSize: "0.76rem", fontWeight: 800, display: "block" }}>
+                {role === "TREASURER" ? "Alex R." : "Jordan L."}
+              </span>
+              <span style={{ fontSize: "0.62rem", opacity: 0.8, textTransform: "uppercase" }}>
+                {role}
+              </span>
+            </div>
+          </button>
         </div>
       </nav>
 
@@ -7102,6 +7157,153 @@ export default function OrbitApp() {
                 }}
               >
                 Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* MODAL: USER ACCOUNT PROFILE DIALOG                   */}
+      {/* ==================================================== */}
+      {showProfileModal && (
+        <div className="receipt-modal-overlay" onClick={() => setShowProfileModal(false)}>
+          <div className="receipt-card" style={{ maxWidth: "480px" }} onClick={(e) => e.stopPropagation()}>
+            <div className="receipt-header">
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div
+                  style={{
+                    width: "48px",
+                    height: "48px",
+                    borderRadius: "50%",
+                    background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
+                    color: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "1.2rem",
+                    fontWeight: 900,
+                    boxShadow: "0 4px 12px rgba(0, 48, 135, 0.3)",
+                  }}
+                >
+                  {role === "TREASURER" ? "AR" : "JL"}
+                </div>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: "1.15rem", fontWeight: 900, color: "#0f172a" }}>
+                    {currentSessionName}
+                  </h3>
+                  <p style={{ margin: "0.15rem 0 0", fontSize: "0.82rem", color: "#64748b" }}>
+                    {currentSessionEmail} • <span style={{ fontWeight: 700, color: "#0070ba" }}>PayPal Orbit Profile</span>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="btn-close-modal"
+                onClick={() => setShowProfileModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Account Details Summary */}
+            <div style={{ margin: "1.25rem 0 1rem", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.85rem" }}>
+                <span style={{ color: "#64748b" }}>Active Role:</span>
+                <span style={{ fontWeight: 800, color: role === "TREASURER" ? "#10b981" : "#0284c7" }}>
+                  {role === "TREASURER" ? "Treasurer (Authorized)" : "Team Member"}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.5rem", fontSize: "0.85rem" }}>
+                <span style={{ color: "#64748b" }}>Associated Entity:</span>
+                <span style={{ fontWeight: 700, color: "#0f172a" }}>
+                  {activeClub ? activeClub.name : "Robotics Club Treasury"}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem" }}>
+                <span style={{ color: "#64748b" }}>Preferred Display Currency:</span>
+                <span style={{ fontWeight: 700, color: "#0070ba" }}>
+                  {currencyRates[selectedCurrency]?.label || "$ USD"}
+                </span>
+              </div>
+            </div>
+
+            {/* Direct Pay Link Quick Action */}
+            <div style={{ marginBottom: "1.25rem" }}>
+              <label style={{ display: "block", fontSize: "0.78rem", fontWeight: 700, color: "#475569", marginBottom: "0.35rem" }}>
+                Your Direct PayPal Payment Link:
+              </label>
+              <div style={{ display: "flex", gap: "0.5rem" }}>
+                <input
+                  type="text"
+                  readOnly
+                  value={typeof window !== "undefined" ? `${window.location.origin}/?tab=send-request&recipient=${encodeURIComponent(currentSessionEmail)}` : `https://paypal.me/${currentSessionEmail.split("@")[0]}`}
+                  className="form-input-text"
+                  style={{ fontSize: "0.82rem", background: "#f1f5f9", color: "#334155" }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    const payUrl = typeof window !== "undefined" ? `${window.location.origin}/?tab=send-request&recipient=${encodeURIComponent(currentSessionEmail)}` : "";
+                    if (payUrl && navigator.clipboard) {
+                      navigator.clipboard.writeText(payUrl);
+                      setCopiedLink(true);
+                      setTimeout(() => setCopiedLink(false), 2000);
+                    }
+                    setActionNotice({ text: `📋 Copied payment link for ${currentSessionEmail}!`, type: "success" });
+                  }}
+                  className="btn-navy-pill"
+                  style={{
+                    whiteSpace: "nowrap",
+                    fontSize: "0.8rem",
+                    padding: "0.4rem 0.85rem",
+                    background: copiedLink ? "#ecfdf5" : "#003087",
+                    color: copiedLink ? "#065f46" : "#ffffff",
+                    border: copiedLink ? "1.5px solid #10b981" : "none",
+                  }}
+                >
+                  {copiedLink ? "✓ Copied" : "Copy Link"}
+                </button>
+              </div>
+            </div>
+
+            <div style={{ display: "flex", gap: "0.75rem" }}>
+              <button
+                type="button"
+                className="btn-primary"
+                onClick={() => {
+                  setShowProfileModal(false);
+                  setSendEmail(currentSessionEmail);
+                  setSendAmount("20.00");
+                  setShowSendModal(true);
+                }}
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  fontSize: "0.85rem",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                  color: "#ffffff",
+                }}
+              >
+                💸 Test Pay Yourself
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowProfileModal(false)}
+                className="btn-navy-pill"
+                style={{
+                  flex: 1,
+                  justifyContent: "center",
+                  background: "#f1f5f9",
+                  color: "#0f172a",
+                  border: "1px solid #cbd5e1",
+                  fontSize: "0.85rem",
+                  padding: "0.65rem",
+                  borderRadius: "8px",
+                }}
+              >
+                Close
               </button>
             </div>
           </div>
