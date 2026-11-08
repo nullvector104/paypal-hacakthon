@@ -2525,15 +2525,19 @@ body {
     display: none;
   }
 
-  /* Floating Copilot Trigger cleared above bottom dock */
-  .copilot-dock-trigger {
-    bottom: 74px !important;
-    right: 14px !important;
+  /* Floating Copilot Trigger hidden on mobile so it never obstructs cards or action buttons */
+  .copilot-dock-trigger,
+  .copilot-dock-trigger.dock-left,
+  .copilot-dock-trigger.dock-right {
+    display: none !important;
   }
 
-  .copilot-dock-trigger.dock-left {
-    left: 14px !important;
-    right: auto !important;
+  /* Clear main content above mobile bottom dock */
+  .orbit-app,
+  .dashboard-content-grid,
+  .tab-pane,
+  .activity-full-page {
+    padding-bottom: 95px !important;
   }
 
   /* Copilot Floating Panel as full-screen sheet on mobile */
@@ -2689,10 +2693,26 @@ body {
     white-space: nowrap !important;
     -webkit-overflow-scrolling: touch !important;
     scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
   }
 
   .club-subnav-strip::-webkit-scrollbar {
-    display: none;
+    display: none !important;
+    height: 0px !important;
+  }
+
+  .club-subtab-btn {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    display: inline-flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  .club-subtab-btn span {
+    white-space: nowrap !important;
+    word-break: keep-all !important;
+    overflow-wrap: normal !important;
   }
 }
 

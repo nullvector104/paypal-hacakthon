@@ -617,7 +617,7 @@ export default function OrbitApp() {
   const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
   const [qrAmount, setQrAmount] = useState<string>("");
   const [qrNote, setQrNote] = useState<string>("Payment to " + currentSessionName);
-  const [qrSeed, setQrSeed] = useState<number>(Date.now());
+  const [qrSeed, setQrSeed] = useState<number>(0);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
 
   // One-Click Export Ledger to CSV
@@ -686,6 +686,7 @@ export default function OrbitApp() {
 
   // 1. Fetch Client ID
   useEffect(() => {
+    setQrSeed(Date.now());
     fetch("/api/config")
       .then((res) => res.json())
       .then((data) => {
@@ -1851,10 +1852,10 @@ export default function OrbitApp() {
 
             {/* Quick Tools: Copilot & Currency */}
             <div className="top-nav-tools-group" style={{ display: "flex", alignItems: "center", gap: "0.35rem" }}>
-              {/* Orbit Copilot Toggle Pill (Desktop Only) */}
+              {/* Orbit Copilot Toggle Pill */}
               <button
                 type="button"
-                className="copilot-nav-toggle-btn desktop-only"
+                className="copilot-nav-toggle-btn"
                 onClick={() => setCopilotOpen((prev) => !prev)}
                 style={{
                   background: copilotOpen ? "rgba(255, 255, 255, 0.25)" : "linear-gradient(135deg, #4f46e5 0%, #009cde 100%)",
@@ -1874,7 +1875,7 @@ export default function OrbitApp() {
                 title="Toggle Orbit AI Copilot"
               >
                 <span style={{ fontSize: "0.78rem" }}>✨</span>
-                <span>Copilot</span>
+                <span className="copilot-label-text">Copilot</span>
               </button>
 
               {/* Compact Currency Dropdown */}
@@ -3141,7 +3142,7 @@ export default function OrbitApp() {
                   </div>
 
                   {/* Sub-tabs: Recent Movements vs Top Contacts */}
-                  <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.85rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.5rem" }}>
+                  <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.85rem", borderBottom: "1px solid #e2e8f0", paddingBottom: "0.5rem", overflowX: "auto", scrollbarWidth: "none", WebkitOverflowScrolling: "touch" }}>
                     <button
                       type="button"
                       onClick={() => setHistoryTab("movements")}
@@ -3154,6 +3155,8 @@ export default function OrbitApp() {
                         fontSize: "0.76rem",
                         fontWeight: 700,
                         cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
                       }}
                     >
                       Recent Payments
@@ -3170,6 +3173,8 @@ export default function OrbitApp() {
                         fontSize: "0.76rem",
                         fontWeight: 700,
                         cursor: "pointer",
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
                       }}
                     >
                       Top Contacts & Orgs ({contactsSummaryList.length})
@@ -5140,8 +5145,8 @@ export default function OrbitApp() {
                     transition: "all 0.15s ease",
                   }}
                 >
-                  <span>{tab.icon}</span>
-                  <span style={{ whiteSpace: "nowrap" }}>{tab.label}</span>
+                  <span style={{ flexShrink: 0 }}>{tab.icon}</span>
+                  <span style={{ whiteSpace: "nowrap", display: "inline-block", wordBreak: "keep-all" }}>{tab.label}</span>
                 </button>
               ))}
             </div>
