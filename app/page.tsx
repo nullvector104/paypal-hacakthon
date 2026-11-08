@@ -2409,7 +2409,7 @@ export default function OrbitApp() {
             {/* TWO-COLUMN DASHBOARD */}
             <div className="dashboard-grid">
               {/* LEFT COLUMN */}
-              <div>
+              <div className="dashboard-left-col">
                 {/* 2 Big Action Cards (Pay someone / Get paid) */}
                 <div className="promo-cards-row">
                   {/* Pay Someone Card */}
@@ -2692,7 +2692,7 @@ export default function OrbitApp() {
               </div>
 
               {/* RIGHT COLUMN */}
-              <div>
+              <div className="dashboard-right-col">
                 {/* 2 Primary Action Pills (Send / Request) */}
                 <div className="right-primary-actions">
                   <button

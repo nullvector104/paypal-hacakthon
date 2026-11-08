@@ -425,11 +425,24 @@ body {
   grid-template-columns: 1.15fr 0.85fr;
   gap: 2rem;
   align-items: start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.dashboard-left-col,
+.dashboard-right-col {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 @media (max-width: 960px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+    gap: 1.5rem;
   }
 }
 
@@ -439,11 +452,17 @@ body {
   grid-template-columns: 1fr 1fr;
   gap: 1.25rem;
   margin-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .promo-cards-row {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
   }
 }
 
@@ -457,6 +476,11 @@ body {
   min-height: 290px;
   box-shadow: 0 6px 18px rgba(0, 48, 135, 0.15);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .promo-action-card:hover {
@@ -483,6 +507,8 @@ body {
   font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 0.4rem;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .promo-card-desc {
@@ -490,6 +516,8 @@ body {
   line-height: 1.4;
   opacity: 0.9;
   margin-bottom: 1.5rem;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .btn-promo-white-pill {
@@ -503,8 +531,10 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
   transition: background 0.15s, transform 0.15s;
-  align-self: flex-start;
+  align-self: stretch;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   text-align: center;
 }
 
@@ -2653,8 +2683,11 @@ body {
   .top-navbar,
   .top-navbar-main,
   .dashboard-grid,
+  .dashboard-left-col,
+  .dashboard-right-col,
   .section-card,
   .promo-cards-row,
+  .promo-action-card,
   .ai-command-container,
   .card-link-banner,
   .profile-header-banner,
@@ -2662,6 +2695,56 @@ body {
     max-width: 100% !important;
     min-width: 0 !important;
     box-sizing: border-box !important;
+  }
+
+  /* Ergonomic mobile cards for Pay Someone and Get Paid */
+  .promo-cards-row {
+    grid-template-columns: 1fr !important;
+    gap: 0.85rem !important;
+    margin-bottom: 1.25rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .promo-action-card {
+    min-height: auto !important;
+    padding: 1.35rem 1.25rem !important;
+    border-radius: 14px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .promo-card-graphic {
+    font-size: 2.2rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .promo-card-title {
+    font-size: 1.3rem !important;
+    margin-bottom: 0.3rem !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .promo-card-desc {
+    font-size: 0.85rem !important;
+    line-height: 1.35 !important;
+    margin-bottom: 1rem !important;
+    word-break: normal !important;
+    overflow-wrap: break-word !important;
+  }
+
+  .btn-promo-white-pill {
+    padding: 0.7rem 1.2rem !important;
+    font-size: 0.9rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    align-self: stretch !important;
   }
 
   /* Ensure flex children don't force overflow */
