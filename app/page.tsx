@@ -4574,7 +4574,7 @@ export default function OrbitApp() {
 
             {/* Sub-navigation & Search Header */}
             <div style={{ display: "flex", gap: "0.75rem", marginBottom: "1.25rem", alignItems: "center", flexWrap: "wrap", justifyContent: "space-between" }}>
-              <div style={{ display: "flex", gap: "0.4rem" }}>
+              <div style={{ display: "flex", gap: "0.4rem", overflowX: "auto", scrollbarWidth: "none" }}>
                 <button
                   type="button"
                   onClick={() => setHistoryTab("movements")}
@@ -4588,6 +4588,8 @@ export default function OrbitApp() {
                     fontWeight: 700,
                     cursor: "pointer",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
                   }}
                 >
                   All Movements ({movements.length})
@@ -4605,6 +4607,8 @@ export default function OrbitApp() {
                     fontWeight: 700,
                     cursor: "pointer",
                     boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
                   }}
                 >
                   Contacts & Organizations ({contactsSummaryList.length})
@@ -5092,12 +5096,16 @@ export default function OrbitApp() {
 
             {/* Club Sub-Tab Navigation Bar */}
             <div
+              className="club-subnav-strip"
               style={{
                 display: "flex",
                 gap: "0.5rem",
                 borderBottom: "1.5px solid #e2e8f0",
                 marginBottom: "1.5rem",
                 overflowX: "auto",
+                whiteSpace: "nowrap",
+                WebkitOverflowScrolling: "touch",
+                scrollbarWidth: "none",
               }}
             >
               {[
@@ -5110,6 +5118,7 @@ export default function OrbitApp() {
                 <button
                   key={tab.id}
                   type="button"
+                  className="club-subtab-btn"
                   onClick={() => {
                     setClubSubTab(tab.id as any);
                     refreshActiveClubData();
@@ -5118,19 +5127,21 @@ export default function OrbitApp() {
                     background: "transparent",
                     border: "none",
                     borderBottom: clubSubTab === tab.id ? "3px solid #4338ca" : "3px solid transparent",
-                    padding: "0.75rem 1.25rem",
+                    padding: "0.75rem 1.15rem",
                     fontSize: "0.92rem",
                     fontWeight: clubSubTab === tab.id ? 800 : 600,
                     color: clubSubTab === tab.id ? "#4338ca" : "var(--text-secondary)",
                     cursor: "pointer",
-                    display: "flex",
+                    display: "inline-flex",
                     alignItems: "center",
                     gap: "0.4rem",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
                     transition: "all 0.15s ease",
                   }}
                 >
                   <span>{tab.icon}</span>
-                  <span>{tab.label}</span>
+                  <span style={{ whiteSpace: "nowrap" }}>{tab.label}</span>
                 </button>
               ))}
             </div>

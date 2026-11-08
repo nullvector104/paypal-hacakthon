@@ -2667,10 +2667,32 @@ body {
     box-sizing: border-box !important;
   }
 
-  /* Break long strings, emails, and URLs */
-  p, span, h1, h2, h3, h4, h5, h6, strong, a, label {
+  /* Safe text wrapping without collapsing tab buttons */
+  p, h1, h2, h3, h4, h5, h6 {
     overflow-wrap: break-word;
-    word-break: break-word;
+  }
+
+  /* All navigation buttons, pills, and subtabs MUST NEVER break letters vertically */
+  .nav-link-btn,
+  .mobile-dock-btn,
+  .club-subtab-btn,
+  .role-switch-btn,
+  .chip-btn,
+  .ai-chip-pill {
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  .club-subnav-strip {
+    display: flex !important;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+  }
+
+  .club-subnav-strip::-webkit-scrollbar {
+    display: none;
   }
 }
 
