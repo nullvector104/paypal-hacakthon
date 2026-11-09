@@ -13,6 +13,7 @@
 import { prisma } from "@/lib/prisma";
 import { ToolDefinition } from "@/lib/llm";
 import { getCurrentMonthRange, getTagSpendingSummaries, checkTagLimitImpact } from "@/lib/spending";
+import { searchChannel3Products } from "@/lib/channel3";
 
 export interface SessionContext {
   userEmail: string;
@@ -22,7 +23,7 @@ export interface SessionContext {
 
 export interface DraftActionPayload {
   isDraft: true;
-  draftType: "SEND" | "REQUEST" | "DUES" | "REMINDER";
+  draftType: "SEND" | "REQUEST" | "DUES" | "REMINDER" | "ADD_TO_CART";
   readyForConfirmation: boolean;
   summary: string;
   data: Record<string, any>;
@@ -1001,6 +1002,76 @@ function parseNumericAmount(val: any): number {
     },
   };
 
+  // -------------------------------------------------------------
+  // DRAFT-ONLY TOOL 5: draft_add_to_cart (Instamart & AI Shopper)
+  // -------------------------------------------------------------
+  const draftAddToCartTool: ToolDefinition = {
+    name: "draft_add_to_cart",
+    description:
+      "Finds product items (like 'cheapest yogurt', 'coffee', 'microcontroller cables') from Instamart and prepares a verified draft to add it to the user's cart.",
+    parameters: {
+      type: "OBJECT",
+      properties: {
+        productQuery: {
+          type: "STRING",
+          description: "Search keyword for the product (e.g. 'yogurt', 'greek yogurt', 'coffee', 'sensors')",
+        },
+        preferCheapest: {
+          type: "BOOLEAN",
+          description: "Whether to specifically select the lowest-priced matching product",
+        },
+        quantity: {
+          type: "INTEGER",
+          description: "Quantity to add to cart (defaults to 1)",
+        },
+      },
+      required: ["productQuery"],
+    },
+    execute: async (args: { productQuery: string; preferCheapest?: boolean; quantity?: number }): Promise<DraftActionPayload> => {
+      const q = (args.productQuery || "").trim();
+      const qty = Math.max(1, args.quantity || 1);
+
+      let products: Array<any> = [];
+      try {
+        products = await searchChannel3Products(q, 8);
+      } catch (err) {
+        console.warn("Product search in AI tool failed:", err);
+      }
+
+      if (products.length === 0) {
+        return {
+          isDraft: true,
+          draftType: "ADD_TO_CART",
+          readyForConfirmation: false,
+          summary: `No available products found matching "${q}" in Instamart catalog.`,
+          data: { notFound: true, query: q },
+        };
+      }
+
+      // Sort by price if cheapest requested or default
+      const sorted = [...products].sort((a, b) => a.cheapestPrice - b.cheapestPrice);
+      const chosen = sorted[0];
+
+      return {
+        isDraft: true,
+        draftType: "ADD_TO_CART",
+        readyForConfirmation: true,
+        summary: `Add ${qty}x ${chosen.title} ($${chosen.cheapestPrice.toFixed(2)} ea) to Cart`,
+        data: {
+          productId: chosen.id,
+          title: chosen.title,
+          unitPrice: chosen.cheapestPrice,
+          quantity: qty,
+          imageUrl: chosen.imageUrl,
+          offerUrl: chosen.offerUrl,
+          domain: chosen.domain,
+          totalPrice: parseFloat((chosen.cheapestPrice * qty).toFixed(2)),
+          currency: chosen.currency || "USD",
+        },
+      };
+    },
+  };
+
   return [
     getTagSummaryTool,
     getLedgerTool,
@@ -1015,5 +1086,6 @@ function parseNumericAmount(val: any): number {
     draftRequestTool,
     draftDuesRequestTool,
     draftReminderTool,
+    draftAddToCartTool,
   ];
 }

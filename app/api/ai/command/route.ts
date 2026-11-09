@@ -46,8 +46,9 @@ CRITICAL DIRECTIVES:
 2. When asked about category limits or spending (e.g. 'Food limit', 'where did our money go'), call get_tag_summary or get_ledger to retrieve real verified figures from the unified ledger.
 3. When asked for treasury health, vault balance, or retainer/dues status, call get_club_balance, get_dues_status, or get_anomaly_candidates.
 4. You CANNOT move money, approve claims, alter the ledger, or create invoices directly.
-5. For actions (send money, request payment, create dues), you MUST use the corresponding DRAFT tool (draft_send, draft_request, draft_dues_request).
-6. Format your responses with polished markdown:
+5. For actions (send money, request payment, create dues, or order/add to cart), you MUST use the corresponding DRAFT tool (draft_send, draft_request, draft_dues_request, draft_add_to_cart).
+6. When asked to shop, find products, get groceries, or find the cheapest item (e.g. 'find the cheapest yogurt', 'order yogurt', 'add coffee to cart', 'find sensors'), call draft_add_to_cart with the productQuery and preferCheapest: true.
+7. Format your responses with polished markdown:
    - Use bold numbers for all dollar amounts (**$25.00**).
    - Use bullet points for transactions and breakdown lines.
    - Keep answers clear, professional, and visually structured.`;
@@ -223,6 +224,28 @@ CRITICAL DIRECTIVES:
             fallbackTools.push({ tool: "draft_send", durationMs: 5, args: { recipientEmail: emailMatch[0], amount: parseFloat(amtMatch[1]) }, result: draft });
             fallbackDraft = draft;
             fallbackText = `I have drafted a direct send of **$${parseFloat(amtMatch[1]).toFixed(2)} USD** to **${emailMatch[0]}** for your review.\n\nPlease review the interactive confirmation card below and click **Confirm Payment** to authorize through PayPal.`;
+          }
+        }
+      }
+
+      // Intent H: Instamart Product Search & Cart Ordering (e.g. 'cheapest yogurt', 'order yogurt', 'buy milk')
+      else if (lower.includes("yogurt") || lower.includes("yoghurt") || lower.includes("cheapest") || lower.includes("buy") || lower.includes("order") || lower.includes("cart") || lower.includes("coffee") || lower.includes("grocer") || lower.includes("shop")) {
+        const draftTool = tools.find((t) => t.name === "draft_add_to_cart");
+        if (draftTool) {
+          // Extract product keyword from query
+          let cleanKeyword = lower
+            .replace(/(?:give|find|show|get|buy|order|add|to|my|the|please|cheapest|cheap|can\s+you|i\s+want)\s*/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          if (!cleanKeyword) cleanKeyword = "yogurt";
+
+          const draft = await draftTool.execute({ productQuery: cleanKeyword, preferCheapest: true, quantity: 1 });
+          fallbackTools.push({ tool: "draft_add_to_cart", durationMs: 12, args: { productQuery: cleanKeyword, preferCheapest: true }, result: draft });
+          fallbackDraft = draft;
+          if (draft.data && !draft.data.notFound) {
+            fallbackText = `### 🛒 Instamart AI Product Finder\n\nFound the best-priced **${cleanKeyword}** in our catalog:\n\n- **Product:** **${draft.data.title}**\n- **Price:** **$${draft.data.unitPrice.toFixed(2)} USD**\n- **Quantity:** **1**\n- **Store / Merchant:** **${draft.data.domain || "Channel3 Direct"}**\n\nClick **Confirm & Add to Cart** below to immediately reserve this item and update your real-time category budget!`;
+          } else {
+            fallbackText = `Could not find any available products matching "${cleanKeyword}" in Instamart right now. Try searching for "yogurt", "coffee", "sensors", or "snacks".`;
           }
         }
       }

@@ -571,6 +571,10 @@ export default function OrbitApp() {
   const [searchQuery, setSearchQuery] = useState<string>("coffee");
   const [products, setProducts] = useState<Product[]>([]);
   const [searching, setSearching] = useState<boolean>(false);
+  const [cartRecommendations, setCartRecommendations] = useState<Product[]>([]);
+  const [recommendationReason, setRecommendationReason] = useState<string>("");
+  const [loadingRecommendations, setLoadingRecommendations] = useState<boolean>(false);
+  const [instamartAiQuery, setInstamartAiQuery] = useState<string>("");
 
   // Tags & Spending State
   const [tags, setTags] = useState<TagSummary[]>([]);
@@ -749,6 +753,22 @@ export default function OrbitApp() {
   }, []);
 
   // 2. Fetch Data
+  const fetchCartRecommendations = useCallback(async () => {
+    try {
+      setLoadingRecommendations(true);
+      const res = await fetch("/api/cart/recommendations");
+      const data = await res.json();
+      if (data.recommendations) {
+        setCartRecommendations(data.recommendations);
+        setRecommendationReason(data.reason || "");
+      }
+    } catch (err) {
+      console.warn("Failed to load cart bundle recommendations:", err);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  }, []);
+
   const fetchCart = useCallback(async () => {
     try {
       const res = await fetch("/api/cart");
@@ -885,12 +905,18 @@ export default function OrbitApp() {
 
   useEffect(() => {
     fetchCart();
+    fetchCartRecommendations();
     fetchTags();
     fetchClubs();
     fetchMovements();
     fetchEvents();
     fetchSplits();
-  }, [fetchCart, fetchTags, fetchClubs, fetchMovements, fetchEvents, fetchSplits]);
+  }, [fetchCart, fetchCartRecommendations, fetchTags, fetchClubs, fetchMovements, fetchEvents, fetchSplits]);
+
+  // Keep recommendations refreshed whenever cart items change
+  useEffect(() => {
+    fetchCartRecommendations();
+  }, [cartItems.length, fetchCartRecommendations]);
 
   // Fundraiser Contribution Handler (Payments via Orders tagged to event)
   const handleDonateToEvent = async (e: React.FormEvent) => {
@@ -1368,6 +1394,7 @@ export default function OrbitApp() {
       // Refresh live system data
       fetchMovements();
       fetchTags();
+      fetchCart();
       refreshActiveClubData();
     } catch (err: any) {
       console.error("Confirm error:", err);
@@ -3354,6 +3381,211 @@ export default function OrbitApp() {
               </p>
             </div>
 
+            {/* AI Shopper & Conversational Grocery Copilot Bar */}
+            <div
+              style={{
+                background: "linear-gradient(135deg, #003087 0%, #0070ba 100%)",
+                borderRadius: "16px",
+                padding: "1.1rem 1.3rem",
+                color: "#ffffff",
+                marginBottom: "1.5rem",
+                boxShadow: "0 8px 24px rgba(0, 48, 135, 0.15)",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.6rem", flexWrap: "wrap", gap: "0.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.55rem" }}>
+                  <span style={{ fontSize: "1.3rem" }}>✨</span>
+                  <span style={{ fontWeight: 800, fontSize: "1.02rem", letterSpacing: "-0.01em" }}>
+                    Instamart AI Shopping Assistant
+                  </span>
+                  <span style={{ fontSize: "0.68rem", background: "rgba(255,255,255,0.22)", padding: "0.15rem 0.5rem", borderRadius: "9999px", fontWeight: 700 }}>
+                    Natural Language Ordering
+                  </span>
+                </div>
+                <span style={{ fontSize: "0.74rem", opacity: 0.9 }}>
+                  Find cheapest products & add directly to cart
+                </span>
+              </div>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (!instamartAiQuery.trim()) return;
+                  handleRunAiCommand(instamartAiQuery, false);
+                }}
+                style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}
+              >
+                <input
+                  type="text"
+                  className="form-input-text"
+                  placeholder="Ask AI to find products (e.g. 'give me the cheapest yogurt', 'find yogurt', 'add coffee to cart')..."
+                  value={instamartAiQuery}
+                  onChange={(e) => setInstamartAiQuery(e.target.value)}
+                  style={{
+                    flex: 1,
+                    minWidth: "260px",
+                    background: "rgba(255,255,255,0.95)",
+                    border: "none",
+                    borderRadius: "10px",
+                    padding: "0.65rem 0.95rem",
+                    fontSize: "0.88rem",
+                    color: "#0f172a",
+                  }}
+                />
+                <button
+                  type="submit"
+                  className="btn-navy-pill"
+                  disabled={aiLoading || !instamartAiQuery.trim()}
+                  style={{
+                    background: "#00d68f",
+                    color: "#0f172a",
+                    fontWeight: 800,
+                    padding: "0.65rem 1.25rem",
+                    border: "none",
+                    borderRadius: "10px",
+                    cursor: "pointer",
+                    fontSize: "0.85rem",
+                  }}
+                >
+                  {aiLoading ? (
+                    <>
+                      <CopilotSpinner size={14} color="#0f172a" />
+                      <span>Searching Catalog...</span>
+                    </>
+                  ) : (
+                    <span>Find & Order via AI ➔</span>
+                  )}
+                </button>
+              </form>
+
+              {/* Quick AI shopping prompt chips */}
+              <div style={{ display: "flex", gap: "0.45rem", marginTop: "0.65rem", flexWrap: "wrap", alignItems: "center" }}>
+                <span style={{ fontSize: "0.72rem", opacity: 0.85, fontWeight: 700 }}>Try asking:</span>
+                {[
+                  { label: "🥣 Cheapest Yogurt", query: "give me the cheapest yogurt and add to cart" },
+                  { label: "☕ Colombian Coffee", query: "find the cheapest coffee in our catalog" },
+                  { label: "⚡ Raspberry Pi & Sensor Kit", query: "find sensors for robotics prototyping" },
+                  { label: "🍪 Healthy Snacks", query: "find snacks under budget" },
+                ].map((chip) => (
+                  <button
+                    key={chip.label}
+                    type="button"
+                    onClick={() => {
+                      setInstamartAiQuery(chip.query);
+                      handleRunAiCommand(chip.query, false);
+                    }}
+                    style={{
+                      background: "rgba(255, 255, 255, 0.16)",
+                      border: "1px solid rgba(255, 255, 255, 0.28)",
+                      color: "#ffffff",
+                      borderRadius: "9999px",
+                      padding: "0.2rem 0.6rem",
+                      fontSize: "0.72rem",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {chip.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* In-Store AI Response Box */}
+              {(aiResponse || aiLoading) && (
+                <div
+                  style={{
+                    marginTop: "1rem",
+                    background: "#ffffff",
+                    borderRadius: "12px",
+                    padding: "1rem",
+                    color: "#0f172a",
+                    boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                  }}
+                >
+                  {aiLoading ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", color: "#0070ba" }}>
+                      <CopilotSpinner size={18} color="#0070ba" />
+                      <span style={{ fontSize: "0.85rem", fontWeight: 700 }}>
+                        Querying Channel3 product inventory & calculating lowest prices...
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      {renderFormattedCopilotText(aiResponse?.text || "")}
+
+                      {/* Interactive Add-to-Cart or Draft Action Card */}
+                      {aiResponse?.draftAction && (
+                        <div
+                          style={{
+                            marginTop: "0.85rem",
+                            padding: "0.9rem",
+                            background: "#f0fdf4",
+                            border: "1.5px solid #86efac",
+                            borderRadius: "10px",
+                          }}
+                        >
+                          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
+                            <div>
+                              <span style={{ fontSize: "0.7rem", fontWeight: 800, background: "#dcfce7", color: "#166534", padding: "0.15rem 0.45rem", borderRadius: "9999px" }}>
+                                ✨ AI Instant Order Draft
+                              </span>
+                              <h5 style={{ fontWeight: 800, fontSize: "0.95rem", margin: "0.3rem 0 0.15rem 0", color: "#14532d" }}>
+                                {aiResponse.draftAction.summary}
+                              </h5>
+                              <p style={{ fontSize: "0.75rem", color: "#4b5563", margin: 0 }}>
+                                Price: <strong>${parseFloat(aiResponse.draftAction.data?.unitPrice || 0).toFixed(2)}</strong> • Merchant: {aiResponse.draftAction.data?.domain || "Channel3"}
+                              </p>
+                            </div>
+
+                            <div style={{ display: "flex", gap: "0.4rem" }}>
+                              <button
+                                type="button"
+                                onClick={handleConfirmAiDraft}
+                                disabled={aiConfirming}
+                                className="btn-navy-pill"
+                                style={{
+                                  background: "#16a34a",
+                                  color: "#ffffff",
+                                  fontWeight: 800,
+                                  fontSize: "0.82rem",
+                                  padding: "0.45rem 0.95rem",
+                                }}
+                              >
+                                {aiConfirming ? (
+                                  <>
+                                    <CopilotSpinner size={14} color="#ffffff" />
+                                    <span>Adding to Cart...</span>
+                                  </>
+                                ) : (
+                                  <span>🛒 Confirm & Add to Cart</span>
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={handleDismissAiDraft}
+                                style={{
+                                  background: "#f1f5f9",
+                                  border: "1px solid #cbd5e1",
+                                  color: "#475569",
+                                  fontWeight: 700,
+                                  fontSize: "0.78rem",
+                                  padding: "0.45rem 0.75rem",
+                                  borderRadius: "9999px",
+                                  cursor: "pointer",
+                                }}
+                              >
+                                Dismiss
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
             <div className="instamart-container">
               {/* Product Catalog Column */}
               <div>
@@ -3556,6 +3788,99 @@ export default function OrbitApp() {
                       <span style={{ fontSize: "1.3rem", fontWeight: 900, color: "#003087" }}>
                         {formatCurrency(cartTotal)}
                       </span>
+                    </div>
+
+                    {/* Amazon-style Frequently Bought Together / AI Bundle Recommendations */}
+                    <div
+                      style={{
+                        marginBottom: "1.1rem",
+                        padding: "0.85rem",
+                        background: "linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%)",
+                        border: "1.5px solid #bae6fd",
+                        borderRadius: "12px",
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "0.45rem" }}>
+                        <span style={{ fontSize: "0.78rem", fontWeight: 800, color: "#0369a1", display: "flex", alignItems: "center", gap: "0.3rem" }}>
+                          <span>💡</span> Frequently Bought Together
+                        </span>
+                        <span style={{ fontSize: "0.68rem", fontWeight: 700, background: "#ffffff", padding: "0.1rem 0.4rem", borderRadius: "9999px", color: "#0284c7" }}>
+                          AI Match
+                        </span>
+                      </div>
+
+                      {recommendationReason && (
+                        <p style={{ fontSize: "0.72rem", color: "#475569", margin: "0 0 0.55rem 0", lineHeight: 1.35 }}>
+                          {recommendationReason}
+                        </p>
+                      )}
+
+                      {loadingRecommendations ? (
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", padding: "0.4rem 0", color: "#0284c7" }}>
+                          <CopilotSpinner size={14} color="#0284c7" />
+                          <span style={{ fontSize: "0.74rem" }}>Analyzing cart pairings...</span>
+                        </div>
+                      ) : cartRecommendations.length === 0 ? (
+                        <p style={{ fontSize: "0.72rem", color: "#64748b", margin: 0 }}>
+                          Add items to see AI-recommended companion accessories.
+                        </p>
+                      ) : (
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                          {cartRecommendations.slice(0, 3).map((rec) => (
+                            <div
+                              key={rec.id}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "space-between",
+                                background: "#ffffff",
+                                padding: "0.45rem 0.6rem",
+                                borderRadius: "8px",
+                                border: "1px solid #e2e8f0",
+                                gap: "0.4rem",
+                              }}
+                            >
+                              <div style={{ minWidth: 0, flex: 1 }}>
+                                <p
+                                  style={{
+                                    fontSize: "0.76rem",
+                                    fontWeight: 700,
+                                    margin: 0,
+                                    whiteSpace: "nowrap",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    color: "#0f172a",
+                                  }}
+                                  title={rec.title}
+                                >
+                                  {rec.title}
+                                </p>
+                                <span style={{ fontSize: "0.72rem", fontWeight: 800, color: "#16a34a" }}>
+                                  +${rec.cheapestPrice.toFixed(2)}
+                                </span>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => handleAddToCart(rec)}
+                                style={{
+                                  background: "#003087",
+                                  color: "#ffffff",
+                                  border: "none",
+                                  borderRadius: "6px",
+                                  padding: "0.25rem 0.55rem",
+                                  fontSize: "0.72rem",
+                                  fontWeight: 800,
+                                  cursor: "pointer",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                + Add
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
                     {/* Tag Selector & Quick Edit */}

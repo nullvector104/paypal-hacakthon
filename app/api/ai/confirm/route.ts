@@ -321,6 +321,58 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // =========================================================
+    // CASE E: CONFIRM ADD TO CART (Instamart AI Shopper)
+    // =========================================================
+    if (draftType === "ADD_TO_CART") {
+      const { productId, title, unitPrice, quantity = 1, imageUrl, offerUrl } = data;
+
+      if (!productId || !title || typeof unitPrice !== "number") {
+        return NextResponse.json(
+          { error: "Invalid product payload for cart addition" },
+          { status: 400 }
+        );
+      }
+
+      // Check if product already exists in user cart
+      const existing = await prisma.cartItem.findFirst({
+        where: { productId },
+      });
+
+      let cartItem;
+      if (existing) {
+        cartItem = await prisma.cartItem.update({
+          where: { id: existing.id },
+          data: {
+            quantity: existing.quantity + quantity,
+            unitPrice,
+          },
+        });
+      } else {
+        cartItem = await prisma.cartItem.create({
+          data: {
+            productId,
+            title,
+            imageUrl: imageUrl || null,
+            unitPrice,
+            quantity: Math.max(1, quantity),
+            offerUrl: offerUrl || null,
+          },
+        });
+      }
+
+      const allItems = await prisma.cartItem.findMany();
+      const updatedTotal = allItems.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0);
+
+      return NextResponse.json({
+        success: true,
+        message: `Added ${quantity}x "${title}" ($${unitPrice.toFixed(2)}) to your cart! Cart total is now $${updatedTotal.toFixed(2)}.`,
+        cartItem,
+        cartTotal: updatedTotal,
+        addedViaAi: true,
+      });
+    }
+
     return NextResponse.json({ error: `Unknown draft type: ${draftType}` }, { status: 400 });
   } catch (error: unknown) {
     console.error("Fatal error in POST /api/ai/confirm:", error);
