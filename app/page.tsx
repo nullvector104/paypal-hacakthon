@@ -2255,20 +2255,6 @@ export default function OrbitApp() {
                         </div>
                       ) : (
                         <>
-                          {/* Tool Call Badges */}
-                          {aiResponse?.toolCalls && aiResponse.toolCalls.length > 0 && (
-                            <div style={{ marginBottom: "0.85rem", borderBottom: "1px dashed #e2e8f0", paddingBottom: "0.5rem" }}>
-                              <span style={{ fontSize: "0.7rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", marginRight: "0.5rem" }}>
-                                Tools Invoked:
-                              </span>
-                              {aiResponse.toolCalls.map((tc, idx) => (
-                                <span key={idx} className="ai-tool-badge">
-                                  ⚡ {tc.tool} ({tc.durationMs}ms)
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
                           {/* Beautiful Polished Response Text */}
                           {renderFormattedCopilotText(aiResponse?.text || "")}
 
@@ -8039,19 +8025,6 @@ export default function OrbitApp() {
             {/* Formatted Response */}
             {aiResponse && !aiLoading && (
               <div style={{ background: "#ffffff", border: "1px solid #e2e8f0", borderRadius: "12px", padding: "1rem", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
-                {aiResponse.toolCalls && aiResponse.toolCalls.length > 0 && (
-                  <div style={{ marginBottom: "0.6rem", borderBottom: "1px dashed #e2e8f0", paddingBottom: "0.4rem" }}>
-                    <span style={{ fontSize: "0.68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", marginRight: "0.4rem" }}>
-                      Tools Invoked:
-                    </span>
-                    {aiResponse.toolCalls.map((tc, idx) => (
-                      <span key={idx} className="ai-tool-badge" style={{ fontSize: "0.68rem" }}>
-                        ⚡ {tc.tool} ({tc.durationMs}ms)
-                      </span>
-                    ))}
-                  </div>
-                )}
-
                 {renderFormattedCopilotText(aiResponse.text)}
 
                 {/* Interactive Action Draft Card */}
