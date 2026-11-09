@@ -329,6 +329,33 @@ function renderFormattedCopilotText(text: string) {
   return <div className="copilot-rich-text">{elements}</div>;
 }
 
+function CopilotSpinner({ size = 18, color = "#4f46e5" }: { size?: number; color?: string }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      style={{
+        display: "inline-block",
+        verticalAlign: "middle",
+        animation: "spin 0.8s linear infinite",
+      }}
+    >
+      <circle cx="12" cy="12" r="10" stroke={color} strokeWidth="3" strokeOpacity="0.25" />
+      <path d="M12 2a10 10 0 0 1 10 10" stroke={color} strokeWidth="3" strokeLinecap="round" />
+      <animateTransform
+        attributeName="transform"
+        type="rotate"
+        from="0 12 12"
+        to="360 12 12"
+        dur="0.8s"
+        repeatCount="indefinite"
+      />
+    </svg>
+  );
+}
+
 export default function OrbitApp() {
   // Navigation State
   const [activeTab, setActiveTab] = useState<
@@ -438,8 +465,30 @@ export default function OrbitApp() {
     }
   }, [splitTotal, splitSelectedMembers, splitIncludeCreator, currentSessionEmail]);
 
+  // Step 7: Clear Copilot queries, drafts, statements and history when switching accounts/roles
+  useEffect(() => {
+    setAiQuery("");
+    setAiResponse(null);
+    setAiError(null);
+    setAiConfirmedResult(null);
+    setSelectedContactForModal(null);
+  }, [role]);
+
   // Unified Ledger State
   const [movements, setMovements] = useState<Movement[]>([]);
+
+  // Role-filtered movements: Treasurer sees full ledger, Member sees statements involving Jordan
+  const visibleMovements = useMemo(() => {
+    if (role === "TREASURER") return movements;
+    return movements.filter(
+      (m) =>
+        m.counterparty.toLowerCase().includes("jordan") ||
+        (m.note && m.note.toLowerCase().includes("jordan")) ||
+        m.paypalRefId?.toLowerCase().includes("jordan") ||
+        m.type === "REQUEST" ||
+        m.direction === "INCOMING"
+    );
+  }, [movements, role]);
 
   // Memoized Counterparty / Contact Aggregation for Payment History
   const contactsSummaryList = useMemo(() => {
@@ -457,7 +506,7 @@ export default function OrbitApp() {
       }
     >();
 
-    for (const m of movements) {
+    for (const m of visibleMovements) {
       const key = m.counterparty.trim().toLowerCase();
       if (!key) continue;
       let entry = map.get(key);
@@ -496,7 +545,7 @@ export default function OrbitApp() {
     return Array.from(map.values()).sort(
       (a, b) => b.totalSent + b.totalReceived - (a.totalSent + a.totalReceived)
     );
-  }, [movements]);
+  }, [visibleMovements]);
 
   // Movements for currently selected contact modal
   const selectedContactData = useMemo(() => {
@@ -505,11 +554,11 @@ export default function OrbitApp() {
       (c) => c.counterparty.toLowerCase() === selectedContactForModal.toLowerCase()
     );
     if (!match) return null;
-    const allMovements = movements.filter(
+    const allMovements = visibleMovements.filter(
       (m) => m.counterparty.toLowerCase() === selectedContactForModal.toLowerCase()
     );
     return { ...match, allMovements };
-  }, [contactsSummaryList, movements, selectedContactForModal]);
+  }, [contactsSummaryList, visibleMovements, selectedContactForModal]);
 
   // PayPal Config
   const [clientId, setClientId] = useState<string>("");
@@ -1220,11 +1269,11 @@ export default function OrbitApp() {
   };
 
   // Step 7: AI Copilot Command Handlers
-  const handleRunAiCommand = async (customQuery?: string) => {
+  const handleRunAiCommand = async (customQuery?: string, openSidebar: boolean = false) => {
     const q = (customQuery || aiQuery).trim();
     if (!q) return;
     if (customQuery) setAiQuery(customQuery);
-    setCopilotOpen(true);
+    if (openSidebar) setCopilotOpen(true);
     setAiLoading(true);
     setAiError(null);
     setAiConfirmedResult(null);
@@ -1268,10 +1317,9 @@ export default function OrbitApp() {
 
   const handleConsolidateContact = (counterparty: string) => {
     setSelectedContactForModal(null);
-    setCopilotOpen(true);
     const q = `consolidate payments for ${counterparty}`;
     setAiQuery(q);
-    handleRunAiCommand(q);
+    handleRunAiCommand(q, copilotOpen);
   };
 
   const handleConfirmAiDraft = async () => {
@@ -1883,6 +1931,11 @@ export default function OrbitApp() {
                   onChange={(e) => {
                     const newRole = e.target.value as "TREASURER" | "MEMBER";
                     setRole(newRole);
+                    setAiQuery("");
+                    setAiResponse(null);
+                    setAiError(null);
+                    setAiConfirmedResult(null);
+                    setSelectedContactForModal(null);
                     setActionNotice({
                       text: `👤 Switched demo role to ${newRole === "TREASURER" ? "Treasurer (Finance Controller)" : "Team Member"}`,
                       type: "info",
@@ -2099,7 +2152,7 @@ export default function OrbitApp() {
         {/* ==================================================== */}
         {activeTab === "home" && (
           <div>
-            {/* Step 7: ORBIT AI FINANCIAL & TREASURY COMMAND BAR (Minimizable & Dockable) */}
+            {/* Step 7: ORBIT AI FINANCIAL & TREASURY COMMAND BAR (Minimizable) */}
             <div className="ai-command-container">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: "0.5rem" }}>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexWrap: "wrap" }}>
@@ -2109,24 +2162,6 @@ export default function OrbitApp() {
                   </span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
-                  <button
-                    type="button"
-                    className="desktop-only"
-                    onClick={() => setCopilotDock(copilotDock === "right" ? "left" : "right")}
-                    style={{
-                      background: "#f1f5f9",
-                      border: "1px solid #cbd5e1",
-                      color: "#475569",
-                      padding: "0.25rem 0.65rem",
-                      borderRadius: "6px",
-                      fontSize: "0.75rem",
-                      cursor: "pointer",
-                      fontWeight: 700,
-                    }}
-                    title="Switch side dock position"
-                  >
-                    Dock: {copilotDock === "right" ? "Right ➔" : "⬅ Left"}
-                  </button>
                   <button
                     type="button"
                     onClick={() => setCopilotMinimizedInline(!copilotMinimizedInline)}
@@ -2155,7 +2190,7 @@ export default function OrbitApp() {
                   <form
                     onSubmit={(e) => {
                       e.preventDefault();
-                      handleRunAiCommand();
+                      handleRunAiCommand(aiQuery, false);
                     }}
                     className="ai-input-wrapper"
                     style={{ marginTop: "0.85rem" }}
@@ -2164,7 +2199,11 @@ export default function OrbitApp() {
                     <input
                       type="text"
                       className="ai-command-input"
-                      placeholder="Ask a financial question, consolidate a contact, or draft an action (e.g. 'consolidate payments for Jordan', 'Food limit?')..."
+                      placeholder={
+                        role === "TREASURER"
+                          ? "Ask a treasury question, consolidate vendor accounts, or predict burn rate (e.g. 'audit treasury for anomalies', 'burn rate forecast')..."
+                          : "Ask about your spending, expense limits, or draft a reimbursement (e.g. 'Food limit?', 'my recent payments')..."
+                      }
                       value={aiQuery}
                       onChange={(e) => setAiQuery(e.target.value)}
                     />
@@ -2175,7 +2214,7 @@ export default function OrbitApp() {
                     >
                       {aiLoading ? (
                         <>
-                          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true" style={{ width: "14px", height: "14px", border: "2px solid #ffffff", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 1s linear infinite" }} />
+                          <CopilotSpinner size={14} color="#ffffff" />
                           <span>Thinking...</span>
                         </>
                       ) : (
@@ -2192,23 +2231,31 @@ export default function OrbitApp() {
                     <span style={{ fontSize: "0.75rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase" }}>
                       Try asking:
                     </span>
-                    {[
-                      { label: "🔮 Predict Burn-Rate & Overspends", query: "analyze this month's burn rate and predict budget overspends" },
-                      { label: "📊 Consolidate Jordan (Engineering)", query: "consolidate payments for jordan@roboticsclub.org" },
-                      { label: "🏢 Consolidate Apex Robotics", query: "consolidate payments for Apex Robotics Dynamics" },
-                      { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
-                      { label: "📈 Where did our money go?", query: "where did our money go? Summarize recent spending from the ledger." },
-                      { label: "⚡ Disburse $250 for Components", query: "draft sending $250 to jordan@roboticsclub.org for lab components" },
-                      { label: "💰 Compute Retainers ($6,000 Budget)", query: "calculate retainers for a $6000 operating budget with 12 partners and a 10% contingency buffer" },
-                      { label: "⚠️ Audit & Anomaly Detection", query: "audit our corporate treasury for any anomalies, spikes, or budget limit breaches" },
-                    ].map((chip) => (
+                    {(role === "TREASURER"
+                      ? [
+                          { label: "🔮 Predict Burn-Rate & Overspends", query: "analyze this month's burn rate and predict budget overspends" },
+                          { label: "🏢 Consolidate Apex Robotics", query: "consolidate payments for Apex Robotics Dynamics" },
+                          { label: "⚠️ Audit & Anomaly Detection", query: "audit our corporate treasury for any anomalies, spikes, or budget limit breaches" },
+                          { label: "💰 Compute Retainers ($6,000 Budget)", query: "calculate retainers for a $6000 operating budget with 12 partners and a 10% contingency buffer" },
+                          { label: "📈 Where did our money go?", query: "where did our money go? Summarize recent spending from the ledger." },
+                          { label: "🏷️ Club Hardware & Category Limits", query: "how much budget remains in Club Hardware and Food?" },
+                        ]
+                      : [
+                          { label: "💳 My Food & Personal Limit", query: "how close am I to my Food limit?" },
+                          { label: "📊 My Reimbursements & Spending", query: "summarize my recent personal expenses and claims from the ledger" },
+                          { label: "⚡ Request Component Reimbursement", query: "draft a reimbursement request for $45.00 for lab sensors" },
+                          { label: "🏷️ Check My Dues Status", query: "what is my current club dues status and do I have open invoices?" },
+                          { label: "📈 Where did our money go?", query: "where did our money go? Summarize recent spending from the ledger." },
+                          { label: "🛍️ Games & Entertainment Budget", query: "how much budget remains in Games and Entertainment?" },
+                        ]
+                    ).map((chip) => (
                       <button
                         key={chip.label}
                         type="button"
                         className="ai-chip-pill"
                         onClick={() => {
                           setAiQuery(chip.query);
-                          handleRunAiCommand(chip.query);
+                          handleRunAiCommand(chip.query, false);
                         }}
                       >
                         {chip.label}
@@ -2248,7 +2295,7 @@ export default function OrbitApp() {
                     <div className="ai-response-box">
                       {aiLoading ? (
                         <div style={{ padding: "0.75rem 0", display: "flex", alignItems: "center", gap: "0.75rem", color: "#6366f1" }}>
-                          <span className="spinner-border" style={{ width: "20px", height: "20px", border: "2.5px solid #6366f1", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />
+                          <CopilotSpinner size={20} color="#6366f1" />
                           <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>
                             Querying unified ledger & executing mathematical models...
                           </span>
@@ -2345,7 +2392,7 @@ export default function OrbitApp() {
                             >
                               {aiConfirming ? (
                                 <>
-                                  <span className="spinner-border spinner-border-sm" style={{ width: "14px", height: "14px", border: "2px solid #ffffff", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 1s linear infinite" }} />
+                                  <CopilotSpinner size={14} color="#ffffff" />
                                   <span>Executing Transfer...</span>
                                 </>
                               ) : (
@@ -3160,13 +3207,13 @@ export default function OrbitApp() {
                   </div>
 
                   {historyTab === "movements" ? (
-                    movements.length === 0 ? (
+                    visibleMovements.length === 0 ? (
                       <p style={{ color: "var(--text-muted)", fontSize: "0.85rem", textAlign: "center", padding: "1rem" }}>
                         No recent activity.
                       </p>
                     ) : (
                       <div className="activity-mini-list">
-                        {movements.slice(0, 4).map((m) => (
+                        {visibleMovements.slice(0, 4).map((m) => (
                           <div
                             key={m.id}
                             className="activity-mini-row"
@@ -4575,7 +4622,7 @@ export default function OrbitApp() {
                     flexShrink: 0,
                   }}
                 >
-                  All Movements ({movements.length})
+                  All Movements ({visibleMovements.length})
                 </button>
                 <button
                   type="button"
@@ -4613,7 +4660,7 @@ export default function OrbitApp() {
             <div className="section-card">
               {historyTab === "movements" ? (
                 (() => {
-                  const filtered = movements.filter(
+                  const filtered = visibleMovements.filter(
                     (m) =>
                       m.counterparty.toLowerCase().includes(contactsSearch.toLowerCase()) ||
                       (m.tag?.name && m.tag.name.toLowerCase().includes(contactsSearch.toLowerCase())) ||
@@ -5210,14 +5257,18 @@ export default function OrbitApp() {
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
-                        handleRunAiCommand();
+                        handleRunAiCommand(aiQuery, false);
                       }}
                       style={{ display: "flex", gap: "0.5rem", marginBottom: "0.85rem" }}
                     >
                       <input
                         type="text"
                         className="form-input-text"
-                        placeholder={`Ask Copilot about ${activeClub.name} (e.g. 'consolidate payments for Jordan', 'summarize dues')...`}
+                        placeholder={
+                          role === "TREASURER"
+                            ? `Ask Copilot about ${activeClub.name} (e.g. 'audit treasury anomalies', 'summarize dues')...`
+                            : `Ask Copilot about ${activeClub.name} (e.g. 'my dues status', 'submit reimbursement')...`
+                        }
                         value={aiQuery}
                         onChange={(e) => setAiQuery(e.target.value)}
                         style={{ fontSize: "0.85rem", padding: "0.5rem 0.85rem", background: "#ffffff" }}
@@ -5329,18 +5380,7 @@ export default function OrbitApp() {
                           gap: "0.75rem",
                         }}
                       >
-                        <span
-                          className="spinner-border"
-                          style={{
-                            width: "20px",
-                            height: "20px",
-                            border: "2.5px solid #4f46e5",
-                            borderTopColor: "transparent",
-                            borderRadius: "50%",
-                            display: "inline-block",
-                            animation: "spin 0.8s linear infinite",
-                          }}
-                        />
+                        <CopilotSpinner size={20} color="#4f46e5" />
                         <span style={{ fontSize: "0.88rem", fontWeight: 700 }}>
                           Analyzing club ledger movements & computing live treasury figures...
                         </span>
@@ -7975,14 +8015,22 @@ export default function OrbitApp() {
           <div className="copilot-panel-body">
             {/* Quick Suggestion Chips */}
             <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-              {[
-                { label: "🔮 Predict Burn-Rate", query: "analyze this month's burn rate and predict budget overspends" },
-                { label: "📊 Consolidate Jordan", query: "consolidate payments for jordan@roboticsclub.org" },
-                { label: "🏢 Consolidate Apex Robotics", query: "consolidate payments for Apex Robotics Dynamics" },
-                { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
-                { label: "📈 Where did money go?", query: "where did our money go? Summarize recent spending from the ledger." },
-                { label: "⚠️ Anomalies", query: "check our club finances for any anomalies, spikes, or limit breaches" },
-              ].map((chip) => (
+              {(role === "TREASURER"
+                ? [
+                    { label: "🔮 Predict Burn-Rate", query: "analyze this month's burn rate and predict budget overspends" },
+                    { label: "🏢 Consolidate Apex Robotics", query: "consolidate payments for Apex Robotics Dynamics" },
+                    { label: "⚠️ Audit Anomalies", query: "audit our corporate treasury for any anomalies, spikes, or budget limit breaches" },
+                    { label: "📈 Where did money go?", query: "where did our money go? Summarize recent spending from the ledger." },
+                    { label: "💰 Compute Retainers", query: "calculate retainers for a $6000 operating budget with 12 partners and a 10% contingency buffer" },
+                  ]
+                : [
+                    { label: "💳 Food limit?", query: "how close am I to my Food limit?" },
+                    { label: "📊 My Reimbursements", query: "summarize my recent personal expenses and claims from the ledger" },
+                    { label: "⚡ Request Reimbursement", query: "draft a reimbursement request for $45.00 for lab sensors" },
+                    { label: "🏷️ Dues Status", query: "what is my current club dues status and do I have open invoices?" },
+                    { label: "📈 Where did money go?", query: "where did our money go? Summarize recent spending from the ledger." },
+                  ]
+              ).map((chip) => (
                 <button
                   key={chip.label}
                   type="button"
@@ -7990,7 +8038,7 @@ export default function OrbitApp() {
                   style={{ fontSize: "0.72rem", padding: "0.25rem 0.55rem" }}
                   onClick={() => {
                     setAiQuery(chip.query);
-                    handleRunAiCommand(chip.query);
+                    handleRunAiCommand(chip.query, true);
                   }}
                 >
                   {chip.label}
@@ -8015,7 +8063,7 @@ export default function OrbitApp() {
             {/* Loading Indicator */}
             {aiLoading && (
               <div style={{ padding: "1.25rem", display: "flex", alignItems: "center", gap: "0.75rem", color: "#4f46e5", background: "#ffffff", borderRadius: "10px", border: "1px solid #e2e8f0" }}>
-                <span className="spinner-border" style={{ width: "20px", height: "20px", border: "2.5px solid #4f46e5", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />
+                <CopilotSpinner size={20} color="#4f46e5" />
                 <span style={{ fontSize: "0.84rem", fontWeight: 700 }}>
                   Analyzing unified ledger & consolidating figures...
                 </span>
@@ -8068,14 +8116,18 @@ export default function OrbitApp() {
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleRunAiCommand();
+                handleRunAiCommand(aiQuery, true);
               }}
               style={{ display: "flex", gap: "0.45rem" }}
             >
               <input
                 type="text"
                 className="form-input-text"
-                placeholder="Ask Copilot or 'consolidate payments for...'..."
+                placeholder={
+                  role === "TREASURER"
+                    ? "Ask Copilot: audit treasury, burn rate, consolidate..."
+                    : "Ask Copilot: my limits, reimbursements, dues..."
+                }
                 value={aiQuery}
                 onChange={(e) => setAiQuery(e.target.value)}
                 disabled={aiLoading}
@@ -8087,7 +8139,7 @@ export default function OrbitApp() {
                 disabled={aiLoading || !aiQuery.trim()}
                 style={{ fontSize: "0.82rem", padding: "0.5rem 0.85rem", minWidth: "70px", justifyContent: "center" }}
               >
-                {aiLoading ? "..." : "Send"}
+                {aiLoading ? <CopilotSpinner size={14} color="#ffffff" /> : "Send"}
               </button>
             </form>
           </div>
