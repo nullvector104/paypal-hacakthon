@@ -102,12 +102,11 @@ export async function callLLM<TData = any>(
   const apiKey = (process.env.LLM_API_KEY || process.env.GEMINI_API_KEY || "").trim();
   const candidateModels = Array.from(
     new Set([
-      "gemini-3.5-flash",
-      (process.env.LLM_MODEL || "gemini-3.5-flash").trim(),
-      "gemini-3-flash-preview",
+      (process.env.LLM_MODEL || "").trim(),
       "gemini-3.5-flash-lite",
-      "gemini-3.1-flash-lite",
-    ])
+      "gemini-3-flash-preview",
+      "gemini-3.5-flash",
+    ].filter(Boolean))
   );
   const maxIterations = Math.min(options.maxIterations || 4, 4);
 
@@ -193,7 +192,7 @@ export async function callLLM<TData = any>(
     // Multi-model fallback cascade on 429, 503, 500, or network timeouts
     for (const modelToTry of candidateModels) {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 12000); // 12-second safety timeout per model
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6-second safety timeout per model
 
       try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
