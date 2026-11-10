@@ -1,11 +1,15 @@
 # 🌌 PayPal Orbit — Enterprise Multi-Entity Treasury, Global Spend Management & AI Autonomous Commerce
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-000000?style=for-the-badge&logo=vercel)](https://paypal-hacakthon-apw2.vercel.app/)
 [![Next.js](https://img.shields.io/badge/Next.js-15-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript)](https://www.typescriptlang.org/)
 [![Prisma](https://img.shields.io/badge/Prisma-ORM-2D3748?style=for-the-badge&logo=prisma)](https://www.prisma.io/)
 [![PostgreSQL](https://img.shields.io/badge/Neon-PostgreSQL-00E599?style=for-the-badge&logo=postgresql)](https://neon.tech/)
 [![PayPal](https://img.shields.io/badge/PayPal-Sandbox_APIs-003087?style=for-the-badge&logo=paypal)](https://developer.paypal.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+> 🚀 **LIVE DEPLOYMENT:**  
+> **Explore the live app:** [https://paypal-hacakthon-apw2.vercel.app/](https://paypal-hacakthon-apw2.vercel.app/)
 
 > ⚠️ **DEVELOPER & EVALUATION NOTICE:**  
 > **This project is an advanced prototype designed for the PayPal AI Global Hackathon.**  
